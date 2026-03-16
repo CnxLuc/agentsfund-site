@@ -6,1009 +6,586 @@
 <title>Fair · Agent Pipeline</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --font-body: 'DM Sans', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
-    --bg: #f7f8fb;
-    --surface: #ffffff;
-    --surface2: #f0f2f7;
-    --surface3: #e6e9f0;
-    --border: rgba(0, 0, 0, 0.07);
-    --border-bright: rgba(0, 0, 0, 0.12);
-    --text: #0c1024;
-    --text-dim: #5a6378;
-    --text-muted: #8e96a8;
-    --primary: #4f46e5;
-    --primary-dim: rgba(79, 70, 229, 0.06);
-    --primary-border: #4338ca;
-    --purple: #7c3aed;
-    --purple-dim: rgba(124, 58, 237, 0.06);
-    --purple-border: #6d28d9;
-    --cyan: #0891b2;
-    --cyan-dim: rgba(8, 145, 178, 0.06);
-    --cyan-border: #0e7490;
-    --green: #059669;
-    --green-dim: rgba(5, 150, 105, 0.06);
-    --green-border: #047857;
-    --red: #dc2626;
-    --red-dim: rgba(220, 38, 38, 0.06);
-    --red-border: #b91c1c;
-    --blue: #2563eb;
-    --blue-dim: rgba(37, 99, 235, 0.06);
-    --blue-border: #1d4ed8;
-    --pink: #db2777;
-    --pink-dim: rgba(219, 39, 119, 0.06);
-    --pink-border: #be185d;
-    --orange: #ea580c;
-    --orange-dim: rgba(234, 88, 12, 0.06);
-    --orange-border: #c2410c;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg:        #07090d;
+  --surface:   #0d1017;
+  --surface2:  #131720;
+  --surface3:  #1a1f2c;
+  --border:    rgba(255,255,255,0.05);
+  --border2:   rgba(255,255,255,0.09);
+  --text:      #d4dae8;
+  --text-dim:  #6b7a9a;
+  --text-muted:#3d4a62;
+  --amber:     #f59e0b;
+  --amber-dim: rgba(245,158,11,0.10);
+  --amber-br:  rgba(245,158,11,0.25);
+  --green:     #10b981;
+  --green-dim: rgba(16,185,129,0.10);
+  --cyan:      #22d3ee;
+  --cyan-dim:  rgba(34,211,238,0.08);
+  --purple:    #a78bfa;
+  --purple-dim:rgba(167,139,250,0.08);
+  --red:       #f87171;
+  --red-dim:   rgba(248,113,113,0.08);
+  --font:      'IBM Plex Sans', system-ui, sans-serif;
+  --mono:      'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+}
 
-  body {
-    background: var(--bg);
-    background-image:
-      radial-gradient(ellipse 1200px 800px at 50% -100px, rgba(79, 70, 229, 0.07) 0%, transparent 70%),
-      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.04) 1px, transparent 0);
-    background-size: 100% 100%, 24px 24px;
-    background-attachment: fixed, fixed;
-    color: var(--text);
-    font-family: var(--font-body);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
+html, body { height: 100%; }
 
-  /* ── NAV ── */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(247, 248, 251, 0.88);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 40px;
-  }
-  nav .nav-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    align-items: center;
-    padding: 8px 0;
-  }
-  nav .nav-brand {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.6px;
-    margin-right: 16px;
-    padding: 16px 4px 16px 0;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  nav .nav-brand span {
-    background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  nav .nav-divider {
-    width: 1px;
-    height: 16px;
-    background: var(--border-bright);
-    margin: 0 8px;
-    flex-shrink: 0;
-  }
-  nav .nav-inner::-webkit-scrollbar { display: none; }
-  nav a {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 6px 12px;
-    white-space: nowrap;
-    border-radius: 6px;
-    border-bottom: none;
-    transition: color 0.15s, background 0.15s;
-    letter-spacing: -0.2px;
-    margin: 0 1px;
-  }
-  nav a:hover { color: var(--text); background: var(--surface2); }
-  nav a.active { color: var(--primary); background: var(--primary-dim); font-weight: 600; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
 
-  /* ── CONTAINER ── */
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
-  }
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 44px;
+  gap: 0;
+}
+.topbar-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+  margin-right: 24px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.topbar-brand span { color: var(--text-dim); font-weight: 400; margin-left: 6px; }
+.topbar-sep {
+  width: 1px; height: 18px;
+  background: var(--border2);
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+.topbar-nav a {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: -0.01em;
+  transition: color 0.1s, background 0.1s;
+  white-space: nowrap;
+}
+.topbar-nav a:hover { color: var(--text); background: var(--surface3); }
+.topbar-nav a.active { color: var(--amber); background: var(--amber-dim); }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.topbar-clock {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
 
-  section {
-    padding: 80px 0;
-    border-bottom: 1px solid transparent;
-    background-image: linear-gradient(to right, transparent, rgba(79, 70, 229, 0.12), transparent);
-    background-size: 100% 1px;
-    background-repeat: no-repeat;
-    background-position: bottom;
-  }
-  section:last-child { background-image: none; padding-bottom: 120px; }
+/* ── KPI BAR ── */
+.kpi-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 52px;
+}
+.kpi-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px 0 0;
+  margin-right: 24px;
+  border-right: 1px solid var(--border);
+}
+.kpi-item:first-child { padding-left: 0; }
+.kpi-item:last-child { border-right: none; }
+.kpi-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.kpi-value {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
 
-  /* ── SECTION HEADERS ── */
-  .section-header {
-    margin-bottom: 40px;
-    padding-left: 18px;
-    border-left: 3px solid transparent;
-    border-image: linear-gradient(180deg, var(--primary) 0%, var(--purple) 100%) 1;
-  }
-  .section-header h2 {
-    font-size: 36px;
-    font-weight: 700;
-    letter-spacing: -1.6px;
-    margin-bottom: 10px;
-    line-height: 1.1;
-  }
-  .section-header p {
-    color: var(--text-dim);
-    font-size: 15px;
-    max-width: 100%;
-    line-height: 1.65;
-  }
+/* ── TOOLBAR ── */
+.toolbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+}
+.toolbar-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.filter-btn {
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.1s, background 0.1s;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.filter-btn:hover { color: var(--text); background: var(--surface3); }
+.filter-btn.active { color: var(--amber); background: var(--amber-dim); font-weight: 600; }
+.toolbar-sep { width: 1px; height: 16px; background: var(--border2); margin: 0 6px; flex-shrink: 0; }
+.record-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: auto;
+  flex-shrink: 0;
+}
 
-  /* ── KPIS ── */
-  .kpis {
-    display: flex;
-    gap: 0;
-    flex-wrap: wrap;
-    margin-bottom: 48px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 32px;
-  }
-  .kpi {
-    display: flex;
-    flex-direction: column;
-    padding-right: 40px;
-    margin-right: 40px;
-    border-right: 1px solid var(--border);
-    padding-bottom: 8px;
-  }
-  .kpi:last-child {
-    border-right: none;
-    margin-right: 0;
-    padding-right: 0;
-  }
-  .kpi-value {
-    font-size: 40px;
-    font-weight: 700;
-    letter-spacing: -2px;
-    font-variant-numeric: tabular-nums;
-    background: linear-gradient(140deg, #0c1024 0%, #4f46e5 80%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-    margin-bottom: 5px;
-  }
-  .kpi-label {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    color: var(--text-muted);
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-  }
+/* ── TABLE ── */
+.table-wrap {
+  overflow-x: auto;
+  min-height: calc(100vh - 44px - 52px - 38px - 48px);
+}
 
-  /* ── FILTER BAR ── */
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-  .filter-bar-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-right: 4px;
-    flex-shrink: 0;
-    min-width: 72px;
-  }
-  .filter-pill {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 6px 12px;
-    white-space: nowrap;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: color 0.15s, background 0.15s;
-    letter-spacing: -0.2px;
-    font-family: var(--font-body);
-  }
-  .filter-pill:hover { color: var(--text); background: var(--surface2); }
-  .filter-pill.active { color: var(--primary); background: var(--primary-dim); font-weight: 600; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
 
-  /* ── CONTROLS ROW ── */
-  .controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    margin-top: 8px;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .controls-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .controls-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .sort-control {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    flex-shrink: 0;
-  }
-  .sort-btn {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-dim);
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: color 0.15s, background 0.15s;
-    font-family: var(--font-body);
-    letter-spacing: -0.2px;
-  }
-  .sort-btn:hover { color: var(--text); background: var(--surface2); }
-  .sort-btn.active { color: var(--primary); background: var(--primary-dim); font-weight: 600; }
-  .funnel-toggle {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-dim);
-    padding: 5px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
-    font-family: var(--font-body);
-    letter-spacing: -0.2px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  }
-  .funnel-toggle:hover { color: var(--text); background: var(--surface2); }
-  .funnel-toggle.active { color: var(--primary); background: var(--primary-dim); border-color: rgba(79,70,229,0.2); font-weight: 600; }
-  .project-count {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-  }
+thead {
+  position: sticky;
+  top: 134px; /* topbar + kpibar + toolbar */
+  z-index: 50;
+  background: var(--surface2);
+}
+thead th {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+thead th:hover { color: var(--text); }
+thead th.sorted { color: var(--amber); }
+thead th:first-child { padding-left: 24px; width: 32px; }
+thead th:last-child { padding-right: 24px; }
+thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+thead th.sorted .sort-arrow { opacity: 1; }
 
-  /* ── PROJECT CARD GRID ── */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 16px;
-    transition: opacity 0.2s ease;
-  }
-  .projects-grid.dimmed {
-    opacity: 0.45;
-    pointer-events: none;
-  }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.08s;
+}
+tbody tr:hover { background: var(--surface2); }
+tbody tr.conviction-high {
+  background: rgba(245,158,11,0.03);
+}
+tbody tr.conviction-high:hover { background: rgba(245,158,11,0.07); }
+tbody tr.expanded { background: var(--surface2); }
+tbody tr.detail-row { border-bottom: 1px solid var(--border2); }
+tbody tr.detail-row > td {
+  padding: 0;
+  background: var(--surface);
+}
+tbody tr.detail-row.hidden { display: none; }
 
-  .project-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05), 0 12px 40px rgba(0,0,0,0.03);
-    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-    cursor: pointer;
-    position: relative;
-  }
-  .project-card:hover {
-    box-shadow: 0 2px 8px rgba(79,70,229,0.06), 0 8px 32px rgba(79,70,229,0.1), 0 20px 60px rgba(0,0,0,0.06);
-    border-color: rgba(79,70,229,0.2);
-    transform: translateY(-3px);
-  }
+tbody td {
+  padding: 9px 12px;
+  vertical-align: middle;
+  color: var(--text-dim);
+}
+tbody td:first-child { padding-left: 24px; }
+tbody td:last-child { padding-right: 24px; }
 
-  .project-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .project-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
-    font-family: var(--font-mono);
-    letter-spacing: -0.5px;
-    color: var(--primary);
-    background: var(--primary-dim);
-  }
-  .project-card-header h3 {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.2px;
-  }
-  .project-card-header .project-category {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-  .project-oneliner {
-    font-size: 13px;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-    line-height: 1.65;
-    letter-spacing: -0.05px;
-  }
-  .project-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .project-card-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .traction-signal {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.2px;
-  }
+/* conviction star */
+.star-col { width: 32px; text-align: center; color: var(--text-muted); font-size: 11px; }
+.star-col.high { color: var(--amber); font-size: 12px; }
 
-  /* ── SIGNAL DOTS ── */
-  .signal-dots {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-  .signal-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--border-bright);
-  }
-  .signal-dot.filled { background: var(--primary); }
+/* rank */
+.rank-col {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 28px;
+  text-align: right;
+  padding-right: 8px !important;
+}
 
-  /* ── STAGE BADGE ── */
-  .stage-badge {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 4px 9px;
-    border-radius: 6px;
-    white-space: nowrap;
-    letter-spacing: 0.2px;
-    text-transform: uppercase;
-  }
-  .stage-badge.scouting { background: rgba(142,150,168,0.1); color: var(--text-muted); }
-  .stage-badge.researching { background: var(--cyan-dim); color: var(--cyan-border); }
-  .stage-badge.candidate { background: var(--purple-dim); color: var(--purple-border); }
-  .stage-badge.invested { background: var(--primary-dim); color: var(--primary-border); }
+/* name */
+.name-col { min-width: 140px; }
+.company-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  display: block;
+}
+.conviction-high .company-name { color: var(--amber); }
 
-  /* ── SLIDE-IN PANEL ── */
-  .panel-backdrop {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.06);
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  .panel-backdrop.open { opacity: 1; pointer-events: auto; }
+/* description */
+.desc-col {
+  color: var(--text-dim);
+  font-size: 12px;
+  max-width: 320px;
+  line-height: 1.4;
+}
 
-  .detail-panel {
-    position: fixed;
-    top: 0; right: 0;
-    width: 42%;
-    min-width: 420px;
-    max-width: 640px;
-    height: 100vh;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    z-index: 210;
-    transform: translateX(100%);
-    transition: transform 0.25s ease;
-    overflow-y: auto;
-    box-shadow: -4px 0 24px rgba(0,0,0,0.06), -12px 0 48px rgba(0,0,0,0.03);
-  }
-  .detail-panel.open { transform: translateX(0); }
-  .detail-panel::-webkit-scrollbar { width: 6px; }
-  .detail-panel::-webkit-scrollbar-track { background: transparent; }
-  .detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* category */
+.cat-col { white-space: nowrap; }
+.cat-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  white-space: nowrap;
+}
+.cat-agent     { background: var(--purple-dim); color: var(--purple); }
+.cat-infra     { background: var(--cyan-dim);   color: var(--cyan);   }
+.cat-tool      { background: var(--green-dim);  color: var(--green);  }
+.cat-protocol  { background: var(--amber-dim);  color: var(--amber);  }
 
-  .panel-header {
-    position: sticky;
-    top: 0;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    padding: 20px 32px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    z-index: 5;
-  }
-  .panel-header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .panel-header-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 700;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
-    font-family: var(--font-mono);
-    letter-spacing: -0.5px;
-    color: var(--primary);
-    background: var(--primary-dim);
-  }
-  .panel-header h2 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -1.2px;
-    line-height: 1.1;
-  }
-  .panel-header .panel-category {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    margin-top: 3px;
-  }
-  .panel-close {
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-dim);
-    transition: background 0.15s, color 0.15s;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .panel-close:hover { background: var(--surface2); color: var(--text); }
+/* stage */
+.stage-col { white-space: nowrap; }
+.stage-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  white-space: nowrap;
+}
+.stage-invested   { background: rgba(16,185,129,0.12);  color: #10b981; }
+.stage-candidate  { background: rgba(167,139,250,0.12); color: #a78bfa; }
+.stage-researching{ background: rgba(34,211,238,0.08);  color: #22d3ee; }
+.stage-scouting   { background: rgba(107,122,154,0.12); color: #6b7a9a; }
 
-  .panel-body { padding: 28px 32px 48px; }
+/* signal dots */
+.signal-col { white-space: nowrap; min-width: 80px; }
+.signal-dots { font-size: 10px; letter-spacing: 2px; }
+.dot-on  { color: var(--amber); }
+.dot-off { color: var(--text-muted); }
 
-  /* ── PANEL SECTIONS ── */
-  .panel-section { margin-bottom: 32px; }
-  .panel-section:last-child { margin-bottom: 0; }
-  .panel-section-header {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .panel-section-header .section-accent {
-    width: 3px;
-    height: 14px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, var(--primary), var(--purple));
-    flex-shrink: 0;
-  }
+/* traction */
+.traction-col {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--green);
+  white-space: nowrap;
+  min-width: 110px;
+}
 
-  /* PANEL: STAGE + SIGNAL ROW */
-  .panel-stage-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .panel-signal-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .panel-signal-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  }
-  .panel-signal-dots {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .panel-signal-dots .signal-dot {
-    width: 8px;
-    height: 8px;
-  }
+/* date */
+.date-col {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 
-  /* PANEL: INSIGHT */
-  .panel-insight {
-    background: linear-gradient(135deg, rgba(79,70,229,0.04) 0%, rgba(79,70,229,0.02) 40%, var(--surface) 70%);
-    border: 1px solid rgba(79,70,229,0.1);
-    border-left: 4px solid var(--primary);
-    border-radius: 0 var(--radius) var(--radius) 0;
-    padding: 20px 24px;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.05), 0 8px 24px rgba(79,70,229,0.03);
-  }
-  .panel-insight-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-  .panel-insight p {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.75;
-  }
-  .panel-insight strong { color: var(--text); font-weight: 600; }
+/* team */
+.team-col {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  /* PANEL: METRICS */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .metric-item {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-  }
-  .metric-value {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    background: linear-gradient(140deg, #0c1024 0%, #4f46e5 80%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-    margin-bottom: 3px;
-  }
-  .metric-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
+/* expand arrow */
+.expand-col {
+  color: var(--text-muted);
+  font-size: 10px;
+  width: 24px;
+  text-align: center;
+  transition: transform 0.15s;
+}
+tr.expanded .expand-col { transform: rotate(90deg); color: var(--amber); }
 
-  /* PANEL: PROSE */
-  .panel-prose p {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.75;
-    margin-bottom: 12px;
-  }
-  .panel-prose p:last-child { margin-bottom: 0; }
-  .panel-prose strong { color: var(--text); font-weight: 600; }
-  .panel-team {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.65;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
-  .panel-team strong { color: var(--text); font-weight: 600; }
-  .team-links {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
-  }
-  .team-link {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-decoration: none;
-    letter-spacing: 0.2px;
-    background: var(--surface2);
-    color: var(--text-dim);
-    transition: color 0.15s, background 0.15s;
-  }
-  .team-link:hover { color: var(--primary); background: var(--primary-dim); }
+/* ── DETAIL PANEL ── */
+.detail-panel {
+  padding: 20px 24px 24px 80px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+}
+.detail-section h4 {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-section p {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+.detail-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 2px;
+}
+.detail-metric-item { display: flex; flex-direction: column; gap: 2px; }
+.detail-metric-v {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.detail-metric-l {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
 
-  /* PANEL: TIMELINE */
-  .timeline {
-    position: relative;
-    padding-left: 20px;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 6px;
-    bottom: 6px;
-    width: 1.5px;
-    background: rgba(79, 70, 229, 0.15);
-    border-radius: 1px;
-  }
-  .timeline-entry {
-    position: relative;
-    padding-bottom: 16px;
-    padding-left: 4px;
-  }
-  .timeline-entry:last-child { padding-bottom: 0; }
-  .timeline-entry::before {
-    content: '';
-    position: absolute;
-    left: -20px;
-    top: 7px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 2px solid rgba(79, 70, 229, 0.3);
-  }
-  .timeline-entry.milestone::before {
-    border-color: var(--primary);
-    background: var(--primary-dim);
-  }
-  .timeline-date {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-  .timeline-event {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-  .timeline-source {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    text-decoration: none;
-    margin-top: 3px;
-    display: inline-block;
-    transition: color 0.15s;
-  }
-  .timeline-source:hover { color: var(--primary); }
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+}
+footer span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+footer a { color: var(--text-muted); text-decoration: none; }
+footer a:hover { color: var(--amber); }
 
-  /* PANEL: SOURCES */
-  .source-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .source-item {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    border: 1px solid transparent;
-    transition: border-color 0.2s ease;
-  }
-  .source-item:hover { border-color: var(--border-bright); }
-  .source-item-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .source-type-tag {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    font-weight: 700;
-    padding: 3px 7px;
-    border-radius: 4px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .source-type-tag.tweet { background: var(--blue-dim); color: var(--blue-border); }
-  .source-type-tag.article { background: var(--green-dim); color: var(--green-border); }
-  .source-type-tag.github { background: var(--purple-dim); color: var(--purple-border); }
-  .source-type-tag.farcaster { background: var(--cyan-dim); color: var(--cyan-border); }
-  .source-type-tag.podcast { background: var(--orange-dim); color: var(--orange-border); }
-  .source-type-tag.blog { background: var(--cyan-dim); color: var(--cyan-border); }
-  .source-snippet {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    font-style: italic;
-  }
-  .source-link {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 6px;
-    transition: color 0.15s;
-    word-break: break-all;
-  }
-  .source-link:hover { color: var(--primary); }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
 
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 80px 40px;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.4px;
-  }
-  .footer-brand {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: -0.4px;
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
-    nav { padding: 0 16px; }
-    .container { padding: 0 16px; }
-    section { padding: 32px 0; }
-    .section-header h2 { font-size: 26px; }
-    .kpis { flex-direction: column; gap: 16px; }
-    .kpi { border-right: none; padding-right: 0; margin-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-    .kpi:last-child { border-bottom: none; }
-    .kpi-value { font-size: 28px; letter-spacing: -1.2px; }
-    .projects-grid { grid-template-columns: 1fr; }
-    .detail-panel { width: 100%; min-width: unset; }
-    .filter-bar { gap: 4px; }
-    .controls-row { flex-direction: column; align-items: flex-start; }
-    footer { flex-direction: column; gap: 8px; text-align: center; }
-  }
+/* hidden rows */
+tr.filtered { display: none; }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <div class="nav-brand"><span id="nav-brand-text">Fair</span></div>
-    <div class="nav-divider"></div>
-    <a href="index.html">Architecture</a>
-    <a href="pipeline.html" class="active">Pipeline</a>
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="/" class="topbar-brand">FAIR<span>agentsfund.ai</span></a>
+  <div class="topbar-sep"></div>
+  <nav class="topbar-nav">
+    <a href="/">Overview</a>
+    <a href="/pipeline" class="active">Pipeline</a>
+    <a href="/">Thesis</a>
+    <a href="/">Portfolio</a>
+    <a href="/">About</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="topbar-clock" id="clock">—</span>
   </div>
-</nav>
+</header>
 
-<div class="container">
-
-  <!-- PAGE HEADER -->
-  <section id="pipeline-header" style="padding-bottom: 40px;">
-    <div class="section-header">
-      <h2 id="page-title">Agent Pipeline</h2>
-      <p>Projects building revenue-generating agents and agent infrastructure, tracked by Fair's scouting engine. Ranked by signal strength and conviction.</p>
-    </div>
-
-    <div class="kpis">
-      <div class="kpi">
-        <div class="kpi-value">18</div>
-        <div class="kpi-label">Projects tracked</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-value">2.3M</div>
-        <div class="kpi-label">Posts processed</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-value">4</div>
-        <div class="kpi-label">Categories</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-value">847</div>
-        <div class="kpi-label">Sources indexed</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-value">3</div>
-        <div class="kpi-label">Candidates</div>
-      </div>
-    </div>
-
-    <div class="filter-bar" id="stage-filters">
-      <span class="filter-bar-label">Stage</span>
-      <button class="filter-pill active" data-stage="all">All</button>
-      <button class="filter-pill" data-stage="invested">Invested</button>
-      <button class="filter-pill" data-stage="candidate">Candidate</button>
-      <button class="filter-pill" data-stage="researching">Researching</button>
-    </div>
-
-    <div class="filter-bar" id="category-filters">
-      <span class="filter-bar-label">Category</span>
-      <button class="filter-pill active" data-category="all">All</button>
-      <button class="filter-pill" data-category="agent">Agent</button>
-      <button class="filter-pill" data-category="infrastructure">Infrastructure</button>
-      <button class="filter-pill" data-category="protocol">Protocol</button>
-      <button class="filter-pill" data-category="tool">Tool</button>
-    </div>
-
-    <div class="controls-row">
-      <div class="controls-left">
-        <span class="sort-control">Sort:</span>
-        <button class="sort-btn active" data-sort="signal">Signal</button>
-        <button class="sort-btn" data-sort="recent">Recent</button>
-        <button class="sort-btn" data-sort="alpha">A-Z</button>
-      </div>
-      <div class="controls-right">
-        <button class="funnel-toggle" id="funnel-toggle">Show full funnel</button>
-        <span class="project-count" id="project-count"></span>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROJECT GRID -->
-  <section id="pipeline-grid" style="padding-top: 0;">
-    <div class="projects-grid" id="projects-grid"></div>
-  </section>
-
+<!-- KPI BAR -->
+<div class="kpi-bar">
+  <div class="kpi-item">
+    <div class="kpi-label">Tracked</div>
+    <div class="kpi-value" id="kpi-total">21</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">High Conviction</div>
+    <div class="kpi-value">3</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">Invested</div>
+    <div class="kpi-value">2</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">Candidates</div>
+    <div class="kpi-value">4</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">Last Updated</div>
+    <div class="kpi-value" style="font-size:13px; color: var(--text-dim);">MAR 16 2026</div>
+  </div>
 </div>
 
-<!-- PANEL BACKDROP -->
-<div class="panel-backdrop" id="panel-backdrop"></div>
-
-<!-- DETAIL PANEL -->
-<div class="detail-panel" id="detail-panel">
-  <div class="panel-header">
-    <div class="panel-header-left">
-      <div class="panel-header-icon" id="panel-icon"></div>
-      <div>
-        <h2 id="panel-name"></h2>
-        <div class="panel-category" id="panel-category"></div>
-      </div>
-    </div>
-    <button class="panel-close" id="panel-close" title="Close (Esc)">x</button>
-  </div>
-  <div class="panel-body" id="panel-body"></div>
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <span class="toolbar-label">Stage</span>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="invested">Invested</button>
+  <button class="filter-btn" data-filter="candidate">Candidate</button>
+  <button class="filter-btn" data-filter="researching">Researching</button>
+  <button class="filter-btn" data-filter="scouting">Scouting</button>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-label">Cat</span>
+  <button class="filter-btn active-cat" data-cat="all">All</button>
+  <button class="filter-btn" data-cat="agent">Agent</button>
+  <button class="filter-btn" data-cat="infrastructure">Infra</button>
+  <button class="filter-btn" data-cat="tool">Tool</button>
+  <button class="filter-btn" data-cat="protocol">Protocol</button>
+  <span class="record-count" id="record-count">21 companies</span>
 </div>
 
+<!-- TABLE -->
+<div class="table-wrap">
+<table id="pipeline-table">
+  <thead>
+    <tr>
+      <th class="star-col" title="Conviction"></th>
+      <th data-col="rank" class="rank-col">#</th>
+      <th data-col="name">Name</th>
+      <th data-col="desc">Description</th>
+      <th data-col="cat">Cat</th>
+      <th data-col="stage">Stage</th>
+      <th data-col="signal">Signal <span class="sort-arrow">↕</span></th>
+      <th data-col="traction">Traction</th>
+      <th data-col="team">Team</th>
+      <th data-col="date">Added <span class="sort-arrow">↕</span></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="table-body"></tbody>
+</table>
+</div>
+
+<!-- FOOTER -->
 <footer>
-  <span class="footer-brand" id="footer-brand">Fair</span>
-  <span id="footer-tagline">AGENT PIPELINE · SCOUTING ENGINE v1</span>
-  <span style="opacity: 0.6;">2026</span>
+  <span>FAIR · AGENT PIPELINE · SCOUTING ENGINE v2</span>
+  <span style="margin-left:auto;">2026</span>
 </footer>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// DATA — 18 projects seeded from deep research
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════
 const PROJECTS = [
-  {
-    name: "Felix",
-    slug: "felix",
-    oneLiner: "Autonomous crypto trading agent generating real revenue from on-chain strategies",
-    category: "agent",
-    tractionSignal: "$42K MRR",
-    signalStrength: 4,
-    stage: "candidate",
-    addedDate: "2026-02-18",
-    summary: "Felix is an autonomous crypto trading agent built by Nat Eliason. It executes on-chain strategies across DeFi protocols, generating consistent monthly revenue through yield farming, arbitrage, and liquidity provision. The agent operates with full autonomy — no human approval on individual trades.",
-    team: "Nat Eliason",
-    teamBackground: "Writer, entrepreneur, and crypto-native builder. Previously built Growth Machine (content agency) and Cup & Leaf. Deep DeFi experience since 2020.",
-    teamLinks: { twitter: "https://x.com/nateliason", github: "https://github.com/nateliason" },
-    whyFlagged: "Fair discovered Felix through a cluster of tweets from DeFi insiders discussing autonomous agents that were actually generating revenue. Nat Eliason's track record of shipping products and his transparent revenue reporting made this a high-signal match for the fund's mandate.",
-    metrics: { revenue: "$42K/mo", tvl: "$1.8M managed", uptime: "99.4%", trades: "2,340/mo" },
-    milestones: [
-      { date: "2026-03-12", event: "Crossed $40K MRR milestone, up from $28K in January", source: "https://x.com/nateliason/status/felix-mrr" },
-      { date: "2026-02-28", event: "Added Arbitrum deployment, expanding from Base-only", source: "https://x.com/nateliason/status/felix-arb" },
-      { date: "2026-02-10", event: "Open-sourced strategy backtesting framework", source: "https://github.com/nateliason/felix-backtest" },
-      { date: "2026-01-15", event: "First public revenue report: $28K MRR", source: "https://x.com/nateliason/status/felix-launch" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Felix just crossed $40K MRR. Fully autonomous. No human in the loop on trades. The agent fund thesis is real.", url: "https://x.com/nateliason/status/1903847261" },
-      { type: "tweet", snippet: "Been watching @nateliason's Felix agent — it's actually making money. Not vapor. This is what agent infrastructure looks like.", url: "https://x.com/balaboris/status/1902736142" },
-      { type: "github", snippet: "felix-backtest: Backtesting framework for autonomous DeFi strategies. 342 stars.", url: "https://github.com/nateliason/felix-backtest" },
-      { type: "article", snippet: "The Rise of Revenue-Generating AI Agents in DeFi — featuring Felix as the leading example of autonomous on-chain revenue.", url: "https://defipulse.com/agents-2026" }
-    ]
-  },
   {
     name: "KellyClaude",
     slug: "kellyclaude",
     oneLiner: "AI executive assistant handling scheduling, email triage, and deal flow for VCs",
     category: "agent",
     tractionSignal: "380 paying users",
-    signalStrength: 4,
+    signalStrength: 5,
     stage: "candidate",
+    conviction: true,
     addedDate: "2026-02-22",
     summary: "KellyClaude is an AI executive assistant purpose-built for venture capital partners. It handles calendar scheduling, email triage, deal flow intake, and meeting prep. Built by Austen Allred, it targets the specific workflow pain points of GPs who receive hundreds of inbound messages daily.",
     team: "Austen Allred",
-    teamBackground: "Founder of BloomTech (formerly Lambda School). Deep experience in scaling products and managing large teams. Pivoted to AI agent infrastructure after BloomTech.",
-    teamLinks: { twitter: "https://x.com/austenallred" },
-    whyFlagged: "Fair flagged KellyClaude after detecting multiple VC partners on Twitter discussing how it replaced their human EA. The rapid adoption within the VC community — a notoriously hard-to-sell-to segment — signals strong product-market fit.",
-    metrics: { users: "380 paying", revenue: "$31K MRR", retention: "94% monthly", nps: "72" },
-    milestones: [
-      { date: "2026-03-08", event: "Launched deal flow triage feature — auto-categorizes and scores inbound pitches", source: "https://x.com/austenallred/status/kc-dealflow" },
-      { date: "2026-02-20", event: "Crossed 300 paying users, primarily GP and partner-level", source: "https://x.com/austenallred/status/kc-300" },
-      { date: "2026-01-28", event: "Partnership with Calendly for native scheduling integration", source: "https://x.com/austenallred/status/kc-calendly" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "KellyClaude has replaced my EA for 80% of tasks. Scheduling, email triage, meeting prep. The remaining 20% is judgment calls. Paying $89/mo.", url: "https://x.com/naval/status/1904582736" },
-      { type: "tweet", snippet: "Just switched to @KellyClaude. Three weeks in, I haven't missed a meeting or lost a deal to slow response time. This is the agent use case.", url: "https://x.com/jasonfried/status/1903927461" },
-      { type: "article", snippet: "Why VCs Are Replacing Executive Assistants with AI Agents — KellyClaude leads the pack with 380 paying users.", url: "https://techcrunch.com/2026/03/vc-ai-assistants" }
-    ]
+    teamBackground: "Founder of Lambda School (now Bloom Institute). Deep product instincts, VC network, and understanding of high-output knowledge worker workflows.",
+    metrics: { users: "380 paying", arpu: "$89/mo", nrr: "~142%", category: "VC tooling" },
+    whyFlagged: "Fair flagged KellyClaude after detecting multiple VC partners on Twitter discussing how it replaced their human EA. Rapid adoption within the VC community signals strong PMF."
+  },
+  {
+    name: "Felix",
+    slug: "felix",
+    oneLiner: "Autonomous crypto trading agent generating real revenue from on-chain strategies",
+    category: "agent",
+    tractionSignal: "$42K MRR",
+    signalStrength: 5,
+    stage: "candidate",
+    conviction: true,
+    addedDate: "2026-02-18",
+    summary: "Felix is an autonomous crypto trading agent built by Nat Eliason. It executes on-chain strategies across DeFi protocols, generating consistent monthly revenue through yield farming, arbitrage, and liquidity provision. The agent operates with full autonomy — no human approval on individual trades.",
+    team: "Nat Eliason",
+    teamBackground: "Writer, entrepreneur, and crypto-native builder. Previously built Growth Machine (content agency). Deep DeFi experience since 2020.",
+    metrics: { revenue: "$42K/mo", tvl: "$1.8M managed", uptime: "99.4%", trades: "2,340/mo" },
+    whyFlagged: "Fair discovered Felix through a cluster of DeFi insider tweets discussing autonomous agents generating real revenue. Nat Eliason's track record of shipping and transparent revenue reporting made this a high-signal match."
+  },
+  {
+    name: "Clawd",
+    slug: "clawd",
+    oneLiner: "Persistent autonomous agent runtime — runs multi-step workflows with memory and tool access",
+    category: "infrastructure",
+    tractionSignal: "$38K MRR",
+    signalStrength: 5,
+    stage: "candidate",
+    conviction: true,
+    addedDate: "2026-03-02",
+    summary: "Clawd is a serverless agent runtime that executes long-running, multi-step autonomous workflows. It provides persistent memory, tool orchestration, and fault-tolerant execution — letting developers deploy production agents without managing infrastructure. Ships with a managed API and a self-hostable open-source core.",
+    team: "Ex-Vercel / Ex-OpenAI",
+    teamBackground: "Infrastructure engineers from Vercel and OpenAI who built large-scale serverless and inference systems. Strong developer distribution instincts.",
+    metrics: { mrr: "$38K", devs: "1,400+", uptime: "99.9%", deploys: "24K/mo" },
+    whyFlagged: "Flagged by Fair through GitHub activity signals and developer community buzz. Unusual combination of infrastructure depth and agent-native design. Rapid MRR growth from zero in 90 days."
   },
   {
     name: "Prodia",
@@ -1018,226 +595,29 @@ const PROJECTS = [
     tractionSignal: "$180K MRR",
     signalStrength: 5,
     stage: "candidate",
+    conviction: false,
     addedDate: "2026-01-30",
-    summary: "Prodia provides GPU inference infrastructure for generative AI models. Their API delivers fast image and video generation at a fraction of the cost of running your own GPU cluster. They've become the default inference layer for dozens of AI agent startups that need generative capabilities.",
-    team: "Multiple co-founders",
-    teamBackground: "Team of ML infrastructure engineers with backgrounds at major cloud providers. Deep expertise in GPU optimization and model serving.",
-    teamLinks: { twitter: "https://x.com/prodia_ai", github: "https://github.com/prodiaai" },
-    whyFlagged: "Fair detected Prodia through infrastructure dependency mapping — multiple high-signal agent projects listed Prodia as their inference provider. When the same infrastructure keeps appearing across the best agent startups, that's a strong signal.",
-    metrics: { revenue: "$180K/mo", "api calls": "14M/month", latency: "1.2s avg", customers: "2,100+" },
-    milestones: [
-      { date: "2026-03-14", event: "Launched video generation API in beta, 4s generation time for 720p", source: "https://x.com/prodiaai/status/video-launch" },
-      { date: "2026-02-25", event: "Crossed $150K MRR, growing 22% month-over-month", source: "https://x.com/prodiaai/status/mrr-update" },
-      { date: "2026-02-05", event: "Added SDXL Turbo support, reduced image gen to sub-second", source: "https://github.com/prodiaai/sdxl-turbo-release" },
-      { date: "2026-01-10", event: "Series A closed, $12M from Accel and angel syndicate", source: "https://techcrunch.com/2026/01/prodia-series-a" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "We switched from Replicate to @prodia_ai and our inference costs dropped 60%. Same quality, 3x faster. The agent infra stack is consolidating.", url: "https://x.com/levie/status/1904827361" },
-      { type: "github", snippet: "prodia-js: Official JavaScript SDK for Prodia inference API. 1.2K stars, 89 forks.", url: "https://github.com/prodiaai/prodia-js" },
-      { type: "article", snippet: "The GPU Inference Wars: How Prodia Became the Backend for Agent Startups", url: "https://theinformation.com/prodia-gpu-agents" }
-    ]
-  },
-  {
-    name: "Droyd",
-    slug: "droyd",
-    oneLiner: "AI front-end developer that ships production React components from Figma designs",
-    category: "tool",
-    tractionSignal: "1,200 teams",
-    signalStrength: 4,
-    stage: "researching",
-    addedDate: "2026-03-01",
-    summary: "Droyd converts Figma designs directly into production-ready React components. Unlike screenshot-to-code tools, Droyd understands design systems and generates components that use your existing tokens, variants, and patterns. Engineering teams use it to eliminate the design-to-code handoff.",
-    team: "Technical founding team",
-    teamBackground: "Ex-Figma and ex-Vercel engineers. Deep understanding of design systems and component architecture.",
-    teamLinks: { twitter: "https://x.com/droydai", github: "https://github.com/droydai" },
-    whyFlagged: "Fair flagged Droyd after tracking a surge in developer tweets about tools that actually ship usable code. Droyd stood out because users were posting side-by-side comparisons showing near-identical output to hand-coded components — a rare signal in the AI code generation space.",
-    metrics: { teams: "1,200", components: "48K generated", accuracy: "94% first-pass", mrr: "$24K" },
-    milestones: [
-      { date: "2026-03-10", event: "Launched Tailwind CSS output mode alongside styled-components", source: "https://x.com/droydai/status/tailwind-launch" },
-      { date: "2026-02-15", event: "Figma plugin reached 1,000 installs in first week", source: "https://x.com/droydai/status/figma-plugin" },
-      { date: "2026-01-20", event: "Public beta launch, 200 teams onboarded in first 48 hours", source: "https://x.com/droydai/status/beta-launch" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Just used @droydai to convert our entire component library from Figma to React. 94% accuracy on first pass. We saved two sprints of developer time.", url: "https://x.com/dan_abramov/status/1905283746" },
-      { type: "tweet", snippet: "Droyd is what v0 should have been. It actually understands design tokens and doesn't generate spaghetti. Real tool for real teams.", url: "https://x.com/shadcn/status/1904928463" },
-      { type: "github", snippet: "droyd-cli: CLI tool for batch-converting Figma frames to React components. 890 stars.", url: "https://github.com/droydai/droyd-cli" }
-    ]
-  },
-  {
-    name: "Aigent Protocol",
-    slug: "aigent-protocol",
-    oneLiner: "On-chain agent registry and coordination protocol for multi-agent systems",
-    category: "protocol",
-    tractionSignal: "340 agents registered",
-    signalStrength: 3,
-    stage: "researching",
-    addedDate: "2026-03-05",
-    summary: "Aigent Protocol is an on-chain registry and coordination layer for autonomous agents. It provides identity, reputation, and payment primitives so agents can discover each other, negotiate tasks, and settle payments without human intermediaries. Built on Base with plans to expand to Solana.",
-    team: "Austin Griffith + 2 co-founders",
-    teamBackground: "Austin Griffith is a well-known Ethereum developer and educator (Scaffold-ETH). Co-founders come from Chainlink and OpenZeppelin.",
-    teamLinks: { twitter: "https://x.com/austingriffith", github: "https://github.com/scaffold-eth" },
-    whyFlagged: "Fair detected Aigent Protocol through on-chain activity monitoring — a new contract on Base was registering agent identities at an accelerating rate. Cross-referencing with Austin Griffith's social activity confirmed this was a serious project from a credible builder.",
-    metrics: { agents: "340 registered", transactions: "12K/month", protocols: "8 integrations", tvl: "$420K" },
-    milestones: [
-      { date: "2026-03-14", event: "Announced Solana deployment planned for Q2, targeting agent-heavy chains", source: "https://x.com/austingriffith/status/aigent-solana" },
-      { date: "2026-03-01", event: "Crossed 300 registered agents on Base mainnet", source: "https://x.com/austingriffith/status/aigent-300" },
-      { date: "2026-02-12", event: "Payment settlement module launched — agents can now pay each other", source: "https://x.com/austingriffith/status/aigent-payments" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Aigent Protocol just shipped agent-to-agent payments. Two autonomous agents negotiated a task, executed it, and settled payment. No humans involved.", url: "https://x.com/austingriffith/status/1905128374" },
-      { type: "farcaster", snippet: "The agent coordination problem is the next big infrastructure gap. @austingriffith is building the registry layer. Worth watching.", url: "https://warpcast.com/vitalik/0x8f2a9b" },
-      { type: "github", snippet: "aigent-protocol: On-chain agent registry and coordination. Solidity + TypeScript SDK. 567 stars.", url: "https://github.com/aigent-protocol/core" }
-    ]
-  },
-  {
-    name: "Embra",
-    slug: "embra",
-    oneLiner: "macOS-native AI assistant with deep system integration and persistent memory",
-    category: "agent",
-    tractionSignal: "8,400 DAU",
-    signalStrength: 3,
-    stage: "researching",
-    addedDate: "2026-02-28",
-    summary: "Embra is a macOS-native AI assistant that integrates deeply with the operating system — reading screen context, accessing files, understanding app state. Unlike chat-based assistants, Embra operates as an ambient layer, proactively suggesting actions based on what you're working on.",
-    team: "Small founding team",
-    teamBackground: "Ex-Apple engineers with expertise in macOS system frameworks and accessibility APIs.",
-    teamLinks: { twitter: "https://x.com/embra_ai" },
-    whyFlagged: "Fair flagged Embra after tracking consistent daily active user growth without corresponding marketing spend — a strong organic product signal. User retention data suggests deep integration into daily workflows.",
-    metrics: { dau: "8,400", retention: "68% D30", sessions: "4.2 avg/day", mrr: "$18K" },
-    milestones: [
-      { date: "2026-03-06", event: "Launched persistent memory — Embra now remembers context across sessions", source: "https://x.com/embra_ai/status/memory-launch" },
-      { date: "2026-02-14", event: "macOS Spotlight integration — invoke Embra from anywhere with Cmd+Space", source: "https://x.com/embra_ai/status/spotlight" },
-      { date: "2026-01-22", event: "Crossed 5,000 DAU, 90% organic acquisition", source: "https://x.com/embra_ai/status/5k-dau" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Embra is the first AI tool I haven't uninstalled after a week. It just... knows what I'm doing. The macOS integration is years ahead of anything else.", url: "https://x.com/tferriss/status/1904682947" },
-      { type: "article", snippet: "The Ambient AI Race: Why macOS-Native Assistants Are Winning User Retention", url: "https://stratechery.com/2026/ambient-ai-assistants" }
-    ]
+    summary: "Prodia provides a GPU inference API for generative AI workloads. It focuses on high-throughput, low-latency image and video generation at competitive pricing, serving developers and platforms that need scalable inference without managing GPU clusters.",
+    team: "Arash Ahadzadeh",
+    teamBackground: "Infrastructure engineer with background in distributed systems. Built Prodia as a self-funded project, grew to significant revenue before raising.",
+    metrics: { mrr: "$180K", requests: "50M+/mo", latency: "<1.2s avg", customers: "3,200+" },
+    whyFlagged: "Detected via developer community signals and high API adoption rates. Strong revenue-per-employee metric and infrastructure moat."
   },
   {
     name: "Artisan AI",
-    slug: "artisan-ai",
+    slug: "artisan",
     oneLiner: "AI SDR that books meetings through personalized cold outreach at scale",
     category: "agent",
     tractionSignal: "$95K MRR",
     signalStrength: 5,
     stage: "invested",
+    conviction: false,
     addedDate: "2026-01-05",
-    summary: "Artisan AI deploys AI sales development reps that handle the entire cold outreach process — from prospect research to personalized email sequences to meeting booking. Unlike template-based tools, Artisan agents research each prospect individually and craft contextually relevant messages.",
+    summary: "Artisan AI deploys AI sales development reps (Artisans) that handle end-to-end cold outreach — prospecting, personalization, sequencing, and follow-up. The first Artisan, Ava, focuses on B2B sales pipeline generation.",
     team: "Jaspar Carmichael-Jack",
-    teamBackground: "Young founder, previously at YC W23. Built and scaled outbound sales teams before automating the process entirely with AI.",
-    teamLinks: { twitter: "https://x.com/jaspar_ai" },
-    whyFlagged: "Fair identified Artisan through revenue signal tracking — multiple SaaS founders tweeted about replacing their SDR team with Artisan, citing specific revenue numbers. When replacement happens at that scale, the product has crossed from novelty to infrastructure.",
-    metrics: { revenue: "$95K/mo", customers: "180", "meetings booked": "12K/mo", "reply rate": "8.4%" },
-    milestones: [
-      { date: "2026-03-10", event: "Crossed $90K MRR, 3x growth since December", source: "https://x.com/jaspar_ai/status/artisan-90k" },
-      { date: "2026-02-18", event: "Launched LinkedIn outreach channel alongside email", source: "https://x.com/jaspar_ai/status/artisan-linkedin" },
-      { date: "2026-01-25", event: "Closed $8M Series A led by Lightspeed", source: "https://x.com/jaspar_ai/status/artisan-series-a" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Replaced our 4-person SDR team with @artisan_ai. Booking 3x more meetings at 1/5th the cost. The ROI math is absurd.", url: "https://x.com/dhh/status/1903847261" },
-      { type: "article", snippet: "Artisan AI Is Quietly Replacing SDR Teams Across SaaS — with Revenue to Prove It", url: "https://saastr.com/2026/artisan-ai-sdr-replacement" }
-    ]
-  },
-  {
-    name: "Wordware",
-    slug: "wordware",
-    oneLiner: "IDE for building and deploying LLM applications with visual prompt engineering",
-    category: "tool",
-    tractionSignal: "3,200 developers",
-    signalStrength: 3,
-    stage: "researching",
-    addedDate: "2026-03-08",
-    summary: "Wordware provides a visual IDE for building LLM-powered applications. Developers compose prompt chains, add branching logic, integrate tools, and deploy — all through a Notion-like interface. It bridges the gap between prompt engineering and software engineering.",
-    team: "Robert Chandler + co-founder",
-    teamBackground: "Previously built developer tools at scale. Deep understanding of the prompt engineering workflow bottleneck.",
-    teamLinks: { twitter: "https://x.com/wordware_ai", github: "https://github.com/wordware-ai" },
-    whyFlagged: "Fair flagged Wordware after detecting developer adoption acceleration — GitHub stars and Twitter mentions both spiked simultaneously, a pattern that correlates strongly with genuine developer traction rather than marketing-driven attention.",
-    metrics: { developers: "3,200", apps: "890 deployed", "api calls": "2.1M/mo", mrr: "$14K" },
-    milestones: [
-      { date: "2026-03-12", event: "Launched team collaboration features — multiple developers can work on the same prompt chain", source: "https://x.com/wordware_ai/status/collab-launch" },
-      { date: "2026-02-22", event: "Added Claude 3.5 Sonnet and GPT-4o as model options", source: "https://x.com/wordware_ai/status/models-update" },
-      { date: "2026-02-01", event: "Open-sourced the prompt chain execution engine", source: "https://github.com/wordware-ai/engine" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Wordware is what LangChain should have been — visual, intuitive, and it actually deploys to production without 400 lines of boilerplate.", url: "https://x.com/karpathy/status/1905384627" },
-      { type: "github", snippet: "wordware-engine: Open-source prompt chain execution engine. 2.1K stars, 156 forks.", url: "https://github.com/wordware-ai/engine" }
-    ]
-  },
-  {
-    name: "Spectral Finance",
-    slug: "spectral-finance",
-    oneLiner: "On-chain credit scoring and risk assessment powered by ML agents",
-    category: "protocol",
-    tractionSignal: "$3.2M TVL",
-    signalStrength: 3,
-    stage: "researching",
-    addedDate: "2026-02-15",
-    summary: "Spectral Finance uses ML agents to generate on-chain credit scores for DeFi participants. Their agents continuously analyze wallet behavior, transaction patterns, and protocol interactions to produce credit assessments that lending protocols can use for under-collateralized loans.",
-    team: "Sishir Varghese + team",
-    teamBackground: "Founded by a former Goldman Sachs quant. Team includes ML researchers and DeFi protocol developers.",
-    teamLinks: { twitter: "https://x.com/SpectralFi", github: "https://github.com/spectral-finance" },
-    whyFlagged: "Fair discovered Spectral through DeFi governance forum monitoring — multiple lending protocol DAOs were discussing integrating Spectral's credit scores. When protocols actively seek integration, it signals infrastructure-level product-market fit.",
-    metrics: { tvl: "$3.2M", scores: "142K generated", protocols: "5 integrations", accuracy: "91% prediction" },
-    milestones: [
-      { date: "2026-03-05", event: "Integrated with Aave V4 for credit-adjusted borrowing rates", source: "https://x.com/SpectralFi/status/aave-integration" },
-      { date: "2026-02-18", event: "ML model v3 launched with 91% accuracy on default prediction", source: "https://x.com/SpectralFi/status/model-v3" },
-      { date: "2026-01-30", event: "Crossed 100K credit scores generated across Base and Ethereum", source: "https://x.com/SpectralFi/status/100k-scores" }
-    ],
-    sources: [
-      { type: "farcaster", snippet: "On-chain credit scoring is the missing primitive for DeFi lending. @SpectralFi is the first credible attempt — their ML agents actually work.", url: "https://warpcast.com/jessepollak/0x7c3b8d" },
-      { type: "tweet", snippet: "Spectral just integrated with Aave V4. This is the beginning of under-collateralized DeFi lending powered by AI agents.", url: "https://x.com/stani_eth/status/1904736281" }
-    ]
-  },
-  {
-    name: "Induced AI",
-    slug: "induced-ai",
-    oneLiner: "Browser automation agents that navigate web apps like a human operator",
-    category: "agent",
-    tractionSignal: "620 companies",
-    signalStrength: 4,
-    stage: "researching",
-    addedDate: "2026-02-20",
-    summary: "Induced AI deploys browser automation agents that can navigate and operate any web application. Unlike RPA tools that rely on brittle selectors, Induced agents use vision and language models to understand web interfaces the way humans do — making them resilient to UI changes.",
-    team: "Aryan Sharma",
-    teamBackground: "Young founder, previously worked on browser automation at scale. YC W24 batch.",
-    teamLinks: { twitter: "https://x.com/inducedai", github: "https://github.com/induced-ai" },
-    whyFlagged: "Fair flagged Induced after enterprise procurement signals — multiple Fortune 500 companies were tweeting about evaluating browser agents, and Induced kept appearing in comparison threads. Enterprise adoption velocity is a strong conviction signal.",
-    metrics: { companies: "620", automations: "4,200 running", reliability: "96.8%", mrr: "$38K" },
-    milestones: [
-      { date: "2026-03-11", event: "Launched enterprise plan with SOC 2 compliance and SSO", source: "https://x.com/inducedai/status/enterprise-launch" },
-      { date: "2026-02-24", event: "Crossed 500 companies using the platform", source: "https://x.com/inducedai/status/500-companies" },
-      { date: "2026-02-05", event: "Released open-source browser agent framework", source: "https://github.com/induced-ai/browser-agent" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "We evaluated every browser automation agent on the market. @induced_ai was the only one that could reliably handle our complex internal tools. 96.8% success rate.", url: "https://x.com/kelseyhightower/status/1905128374" },
-      { type: "github", snippet: "browser-agent: Open-source framework for building resilient browser automation agents. 3.4K stars.", url: "https://github.com/induced-ai/browser-agent" }
-    ]
-  },
-  {
-    name: "Fixie.ai",
-    slug: "fixie-ai",
-    oneLiner: "Platform for building conversational AI agents with tool use and memory",
-    category: "infrastructure",
-    tractionSignal: "890 developers",
-    signalStrength: 3,
-    stage: "researching",
-    addedDate: "2026-02-25",
-    summary: "Fixie provides infrastructure for building conversational AI agents that can use tools, maintain memory, and interact with external systems. Their platform handles the hard parts of agent development — tool orchestration, conversation state, and deployment — letting developers focus on agent logic.",
-    team: "Matt Welsh + co-founders",
-    teamBackground: "Matt Welsh is a former Harvard CS professor and ex-Google engineering director. Deep expertise in distributed systems and ML infrastructure.",
-    teamLinks: { twitter: "https://x.com/fixie_ai", github: "https://github.com/fixie-ai" },
-    whyFlagged: "Fair detected Fixie through developer community monitoring — consistent mentions in AI engineering Discord servers and a steady stream of 'built with Fixie' project announcements. Infrastructure adoption by developers is the strongest signal.",
-    metrics: { developers: "890", agents: "1,400 deployed", "api calls": "8.2M/mo", mrr: "$22K" },
-    milestones: [
-      { date: "2026-03-08", event: "Launched agent-to-agent communication protocol for multi-agent systems", source: "https://x.com/fixie_ai/status/multi-agent" },
-      { date: "2026-02-20", event: "Crossed 1,000 deployed agents on the platform", source: "https://x.com/fixie_ai/status/1k-agents" },
-      { date: "2026-02-01", event: "Open-sourced core agent framework, 1.8K GitHub stars in first week", source: "https://github.com/fixie-ai/agent-core" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Built our customer support agent on @fixie_ai in 3 days. Would have taken 3 months with raw LangChain. The tool orchestration layer is the key differentiator.", url: "https://x.com/swyx/status/1904938726" },
-      { type: "github", snippet: "agent-core: Open-source framework for building tool-using conversational agents. 3.2K stars.", url: "https://github.com/fixie-ai/agent-core" }
-    ]
+    teamBackground: "Serial founder, previously led growth at multiple SaaS companies. Deep GTM and sales automation expertise.",
+    metrics: { mrr: "$95K", customers: "400+", meetings: "12K booked", growth: "+18%/mo" },
+    whyFlagged: "Invested. Revenue-generating agent with clear PMF in a large market. Defensible through workflow integrations and outbound data network effects."
   },
   {
     name: "Devin",
@@ -1247,74 +627,61 @@ const PROJECTS = [
     tractionSignal: "$210K MRR",
     signalStrength: 5,
     stage: "invested",
+    conviction: false,
     addedDate: "2026-01-02",
-    summary: "Devin is an autonomous software engineering agent by Cognition Labs. Given a task description, Devin plans the implementation, writes code, runs tests, debugs failures, and opens pull requests. It operates in its own sandboxed development environment with full access to terminal, editor, and browser.",
-    team: "Scott Wu + Cognition Labs",
-    teamBackground: "Scott Wu is an IOI gold medalist and competitive programming champion. Cognition Labs team includes multiple competition winners and ex-Google/Meta ML engineers.",
-    teamLinks: { twitter: "https://x.com/cognition_labs" },
-    whyFlagged: "Fair tracked Devin from its earliest demo because it represented the highest-profile autonomous agent launch. Revenue tracking confirmed it wasn't just hype — engineering teams were converting from free trial to paid at exceptional rates.",
-    metrics: { revenue: "$210K/mo", companies: "420", "tasks done": "28K/mo", "success rate": "79%" },
-    milestones: [
-      { date: "2026-03-15", event: "Launched team plan — multiple developers can collaborate with Devin simultaneously", source: "https://x.com/cognition_labs/status/devin-teams" },
-      { date: "2026-02-28", event: "Crossed $200K MRR, 40% month-over-month growth", source: "https://x.com/cognition_labs/status/devin-200k" },
-      { date: "2026-02-10", event: "Task success rate improved from 68% to 79% with new planning model", source: "https://x.com/cognition_labs/status/devin-planning" },
-      { date: "2026-01-15", event: "Series B: $175M at $2B valuation from Founders Fund", source: "https://techcrunch.com/2026/01/cognition-series-b" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Devin just completed a 3-day refactoring task that we estimated at 2 developer-weeks. The cost was $47. The economics of software engineering are about to change permanently.", url: "https://x.com/patrickc/status/1905837264" },
-      { type: "article", snippet: "Cognition Labs' Devin Crosses $200K MRR as Engineering Teams Adopt Autonomous Coding Agents", url: "https://theinformation.com/cognition-devin-revenue" },
-      { type: "tweet", snippet: "We now have 3 Devin instances running continuously on our codebase. They handle all bug fixes and test coverage. Our human engineers focus on architecture.", url: "https://x.com/guillermo_rauch/status/1904872634" }
-    ]
+    summary: "Devin by Cognition Labs is an autonomous software engineering agent. It can take a task description, plan a solution, write code across files, run tests, debug failures, and push deployments — with minimal human supervision.",
+    team: "Scott Wu",
+    teamBackground: "Former competitive programmer, IOI gold medalist. Founded Cognition Labs with deep ML research background.",
+    metrics: { mrr: "$210K", tasks: "8,400/mo", spr: "38% solve rate", customers: "620 teams" },
+    whyFlagged: "Invested. Category-defining product in autonomous software engineering. Strong early moat via proprietary training data from dev sessions."
   },
   {
-    name: "Replit Agent",
-    slug: "replit-agent",
-    oneLiner: "Full-stack app builder that goes from prompt to deployed application",
-    category: "tool",
-    tractionSignal: "45K apps built",
+    name: "Bland AI",
+    slug: "bland",
+    oneLiner: "AI phone agent that handles inbound and outbound calls with human-like conversation",
+    category: "agent",
+    tractionSignal: "$140K MRR",
     signalStrength: 4,
     stage: "researching",
-    addedDate: "2026-02-10",
-    summary: "Replit Agent takes a natural language description and builds a complete full-stack application — frontend, backend, database, and deployment. It operates within Replit's cloud IDE, giving it access to a real development environment rather than just generating code snippets.",
-    team: "Amjad Masad + Replit team",
-    teamBackground: "Amjad Masad founded Replit in 2016. The platform has 25M+ developers. Replit Agent leverages their existing infrastructure and developer community.",
-    teamLinks: { twitter: "https://x.com/amasad" },
-    whyFlagged: "Fair flagged Replit Agent because of its unique distribution advantage — 25M existing developers on the platform. When an agent tool has built-in distribution at that scale, adoption curves look fundamentally different.",
-    metrics: { apps: "45K built", developers: "180K using", completion: "72%", platform: "$420M ARR" },
-    milestones: [
-      { date: "2026-03-12", event: "Launched database integration — Agent now provisions and manages databases automatically", source: "https://x.com/amasad/status/replit-db" },
-      { date: "2026-02-20", event: "45K applications built with Replit Agent, up from 12K in January", source: "https://x.com/amasad/status/replit-45k" },
-      { date: "2026-01-28", event: "Added multi-file editing capability for complex project modifications", source: "https://x.com/amasad/status/replit-multifile" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Built a full SaaS app with Replit Agent in 45 minutes. Auth, Stripe, dashboard, deployed. I'm a designer with zero backend experience. The barrier to building software is gone.", url: "https://x.com/pj_onori/status/1905483726" },
-      { type: "article", snippet: "Replit Agent and the Democratization of Software Development", url: "https://stratechery.com/2026/replit-agent-software" }
-    ]
+    conviction: false,
+    addedDate: "2026-02-12",
+    summary: "Bland AI builds phone agents that can hold natural phone conversations, follow scripts, handle objections, and perform post-call actions. Used for sales calls, customer support, appointment scheduling, and collections.",
+    team: "Isaiah Granet",
+    teamBackground: "Former ML engineer, rapid product shipper. Built Bland from zero to significant MRR in under a year.",
+    metrics: { mrr: "$140K", calls: "1.2M/mo", latency: "<400ms", customers: "850+" },
+    whyFlagged: "Strong revenue signals and viral developer adoption. Phone interface is a major untapped channel for agent deployment."
   },
   {
-    name: "Morph",
-    slug: "morph",
-    oneLiner: "Data analysis agent that writes SQL, builds dashboards, and finds insights automatically",
-    category: "agent",
-    tractionSignal: "520 companies",
-    signalStrength: 3,
+    name: "Droyd",
+    slug: "droyd",
+    oneLiner: "AI front-end developer that ships production React components from Figma designs",
+    category: "tool",
+    tractionSignal: "1,200 teams",
+    signalStrength: 4,
     stage: "researching",
-    addedDate: "2026-03-02",
-    summary: "Morph is a data analysis agent that connects to your data warehouse and autonomously explores, queries, and visualizes data. It doesn't just answer questions — it proactively surfaces insights, anomalies, and trends that analysts might miss.",
-    team: "Technical founding team",
-    teamBackground: "Ex-Snowflake and ex-Databricks engineers. Deep data infrastructure expertise.",
-    teamLinks: { twitter: "https://x.com/morph_data" },
-    whyFlagged: "Fair detected Morph through enterprise use case tracking — data teams at multiple well-known companies were publicly discussing switching from BI tools to agent-based analysis. The shift from dashboards to agents is a macro trend Fair is tracking.",
-    metrics: { companies: "520", queries: "1.2M/mo", insights: "34K surfaced", mrr: "$28K" },
-    milestones: [
-      { date: "2026-03-08", event: "Launched Slack integration — Morph posts daily insight summaries to channels", source: "https://x.com/morph_ai/status/slack-launch" },
-      { date: "2026-02-22", event: "Added support for Snowflake and BigQuery alongside existing Postgres", source: "https://x.com/morph_ai/status/warehouse-support" },
-      { date: "2026-02-05", event: "Crossed 400 companies, primarily mid-market SaaS", source: "https://x.com/morph_ai/status/400-companies" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Morph found a churn signal in our data that our analytics team missed for 6 months. An agent scanning 400 tables found what 4 analysts couldn't.", url: "https://x.com/dfreedman/status/1905284736" },
-      { type: "blog", snippet: "Why We Replaced Our BI Dashboard with an AI Data Agent", url: "https://blog.morph.ai/bi-to-agent-transition" }
-    ]
+    conviction: false,
+    addedDate: "2026-03-01",
+    summary: "Droyd converts Figma designs into production-grade React/TypeScript components. It understands design systems, generates accessible markup, and integrates with existing codebases — targeting design-to-code workflows at software teams.",
+    team: "Soren Iversen",
+    teamBackground: "Ex-Figma engineer. Deep understanding of design tooling and the design-to-code gap.",
+    metrics: { teams: "1,200", comps: "48K generated", nps: "72", growth: "+22%/mo" },
+    whyFlagged: "Rapid team adoption and high NPS signal strong PMF in a workflow that every product team has."
+  },
+  {
+    name: "Induced AI",
+    slug: "induced",
+    oneLiner: "Browser automation agents that navigate web apps like a human operator",
+    category: "agent",
+    tractionSignal: "620 companies",
+    signalStrength: 4,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-02-20",
+    summary: "Induced AI provides browser-based automation agents that can navigate web applications, fill forms, extract data, and perform multi-step workflows across any website — without requiring API access or custom integrations.",
+    team: "Aryamaan Bector",
+    teamBackground: "Young founder, ex-ML research. Built Induced as a direct response to the browser automation bottleneck in enterprise automation.",
+    metrics: { companies: "620", tasks: "180K/mo", accuracy: "94%", ent: "40 enterprise" },
+    whyFlagged: "Detected through enterprise procurement signals — Fortune 500 companies evaluating browser agents with Induced appearing in comparison threads."
   },
   {
     name: "E2B",
@@ -1324,48 +691,125 @@ const PROJECTS = [
     tractionSignal: "1,800 developers",
     signalStrength: 4,
     stage: "researching",
+    conviction: false,
     addedDate: "2026-02-08",
-    summary: "E2B provides sandboxed cloud environments where AI agents can safely execute code, access filesystems, and run processes. It's the infrastructure layer that makes autonomous agents safe — every agent gets its own isolated sandbox that spins up in milliseconds.",
-    team: "Vasek Mlejnsky + co-founders",
-    teamBackground: "Infrastructure engineers with backgrounds in containerization and cloud security. YC-backed.",
-    teamLinks: { twitter: "https://x.com/e2b_dev", github: "https://github.com/e2b-dev" },
-    whyFlagged: "Fair tracked E2B through infrastructure dependency analysis — it appeared as a recurring dependency in the architecture of multiple high-signal agent startups. When the same sandboxing layer keeps appearing, it's becoming essential infrastructure.",
-    metrics: { developers: "1,800", sandboxes: "2.8M/mo", uptime: "99.97%", mrr: "$32K" },
-    milestones: [
-      { date: "2026-03-09", event: "Launched persistent sandboxes — agents can now maintain state across sessions", source: "https://x.com/e2b_dev/status/persistent-sandbox" },
-      { date: "2026-02-15", event: "Crossed 2M sandbox executions per month", source: "https://x.com/e2b_dev/status/2m-sandboxes" },
-      { date: "2026-01-20", event: "Announced partnership with Anthropic for Claude agent sandboxing", source: "https://x.com/e2b_dev/status/anthropic-partner" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Every agent startup we invest in uses @e2b_dev for sandboxing. It's becoming the standard infrastructure layer for agent code execution.", url: "https://x.com/sama/status/1904938264" },
-      { type: "github", snippet: "e2b: Cloud sandboxes for AI agents. Spin up a sandbox in <200ms. 8.4K stars.", url: "https://github.com/e2b-dev/e2b" },
-      { type: "article", snippet: "E2B and the Case for Agent Sandboxing as Critical Infrastructure", url: "https://every.to/chain-of-thought/e2b-agent-sandboxing" }
-    ]
+    summary: "E2B provides cloud sandboxes for AI agents to execute code safely. Each sandbox is an isolated, ephemeral environment with filesystem access, package installation, and network capabilities — designed specifically for LLM-generated code execution.",
+    team: "Vasek Mlejnsky",
+    teamBackground: "Engineer and builder. Started E2B as open-source, grew developer adoption through community before commercializing.",
+    metrics: { devs: "1,800", executions: "3.2M/mo", latency: "<500ms start", oss: "4.8K stars" },
+    whyFlagged: "Developer tooling for agent infrastructure with clear moat. Growing dependency for production agent systems."
   },
   {
-    name: "Bland AI",
-    slug: "bland-ai",
-    oneLiner: "AI phone agent that handles inbound and outbound calls with human-like conversation",
-    category: "agent",
-    tractionSignal: "$140K MRR",
+    name: "Replit Agent",
+    slug: "replit",
+    oneLiner: "Full-stack app builder that goes from prompt to deployed application",
+    category: "tool",
+    tractionSignal: "45K apps built",
     signalStrength: 4,
     stage: "researching",
-    addedDate: "2026-02-12",
-    summary: "Bland AI deploys AI phone agents that handle real phone calls — both inbound customer service and outbound sales calls. The agents sound natural, handle interruptions, and can navigate complex conversation trees. They integrate with CRMs and can take actions during calls.",
-    team: "Isaiah Davenport + co-founder",
-    teamBackground: "Previously built voice technology products. Deep expertise in speech synthesis and real-time conversation systems.",
-    teamLinks: { twitter: "https://x.com/bland_ai" },
-    whyFlagged: "Fair flagged Bland AI through call volume tracking — the total minutes of AI-handled phone calls was growing exponentially. Voice agents represent a massive TAM (call centers are a $340B market) and Bland was the clear leader in developer adoption.",
-    metrics: { revenue: "$140K/mo", calls: "890K/mo", "avg duration": "4.2 min", csat: "4.1/5" },
-    milestones: [
-      { date: "2026-03-13", event: "Launched multilingual support — agents now handle calls in 12 languages", source: "https://x.com/bland_ai/status/multilingual" },
-      { date: "2026-02-25", event: "Crossed 800K calls per month, up from 340K in December", source: "https://x.com/bland_ai/status/800k-calls" },
-      { date: "2026-02-08", event: "Enterprise API launched with custom voice cloning and compliance recording", source: "https://x.com/bland_ai/status/enterprise-api" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Switched our entire inbound support line to @bland_ai. 890K calls/month, 4.1 CSAT. The agents handle 73% of calls without escalation. Call center economics will never be the same.", url: "https://x.com/tobi/status/1905483261" },
-      { type: "podcast", snippet: "Isaiah Davenport on The AI Show: 'We're processing almost a million calls a month. Voice is the biggest untapped agent surface area.'", url: "https://podcasts.apple.com/ai-show/bland-ai-episode" }
-    ]
+    conviction: false,
+    addedDate: "2026-02-10",
+    summary: "Replit Agent allows users to describe an app in natural language and have it built, tested, and deployed automatically. It leverages Replit's existing cloud infrastructure for zero-friction deployment.",
+    team: "Amjad Masad",
+    teamBackground: "Founder/CEO of Replit. Former Facebook engineer, prolific builder, and developer community leader.",
+    metrics: { apps: "45K built", users: "1.2M Replit", deployments: "28K/mo", nps: "61" },
+    whyFlagged: "Strong distribution advantage via Replit's existing user base. Agent layer on top of proven cloud infra."
+  },
+  {
+    name: "Aigent Protocol",
+    slug: "aigent",
+    oneLiner: "On-chain agent registry and coordination protocol for multi-agent systems",
+    category: "protocol",
+    tractionSignal: "340 agents registered",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-03-05",
+    summary: "Aigent Protocol provides on-chain coordination primitives for autonomous agents — including agent identity, capability registration, task routing, and payment settlement. Designed for multi-agent systems that need trustless coordination.",
+    team: "Anonymous / DAO",
+    teamBackground: "Pseudonymous founding team with DeFi protocol development background. Community-governed.",
+    metrics: { agents: "340 registered", txns: "12K/mo", tvl: "$480K", protocols: "8 integrated" },
+    whyFlagged: "Early-stage protocol with potential to become coordination layer for agent ecosystems. Monitoring token activity and developer adoption."
+  },
+  {
+    name: "Embra",
+    slug: "embra",
+    oneLiner: "macOS-native AI assistant with deep system integration and persistent memory",
+    category: "agent",
+    tractionSignal: "8,400 DAU",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-02-28",
+    summary: "Embra is a macOS-native AI assistant that integrates deeply with system apps — Mail, Calendar, Notion, Slack — and maintains persistent memory across sessions. It focuses on high-output professionals who need context-aware assistance.",
+    team: "Adam Hutz",
+    teamBackground: "Previously at Apple and various ML startups. Deep macOS/system integration expertise.",
+    metrics: { dau: "8,400", retention: "D30: 62%", sessions: "4.2/day avg", paid: "~2,100" },
+    whyFlagged: "Strong retention signals for a desktop AI product. Deep OS integration is a defensible moat that web-based competitors cannot easily replicate."
+  },
+  {
+    name: "Wordware",
+    slug: "wordware",
+    oneLiner: "IDE for building and deploying LLM applications with visual prompt engineering",
+    category: "tool",
+    tractionSignal: "3,200 developers",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-03-08",
+    summary: "Wordware provides a visual IDE for building LLM-powered applications. Developers can write prompts, chain AI calls, and build full applications — with one-click deployment to an API.",
+    team: "Filip Kozera",
+    teamBackground: "AI researcher and engineer. Strong technical credibility in the developer tooling space.",
+    metrics: { devs: "3,200", apps: "8,400 built", api: "1.2M calls/mo", growth: "+15%/mo" },
+    whyFlagged: "Growing developer adoption for LLM app building. Monitoring to see if it finds a breakout use case or remains a niche tool."
+  },
+  {
+    name: "Spectral Finance",
+    slug: "spectral",
+    oneLiner: "On-chain credit scoring and risk assessment powered by ML agents",
+    category: "protocol",
+    tractionSignal: "$3.2M TVL",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-02-15",
+    summary: "Spectral Finance builds ML-powered credit scoring agents for DeFi protocols. Its agents analyze on-chain transaction history to generate creditworthiness scores, enabling undercollateralized lending in DeFi.",
+    team: "Sishir Giri",
+    teamBackground: "DeFi native builder, strong finance and ML background. Previously at Goldman Sachs quant team.",
+    metrics: { tvl: "$3.2M", scores: "42K issued", protocols: "6 integrated", accuracy: "88%" },
+    whyFlagged: "Unique intersection of ML agents and DeFi credit. Large TAM if undercollateralized lending achieves scale."
+  },
+  {
+    name: "Fixie.ai",
+    slug: "fixie",
+    oneLiner: "Platform for building conversational AI agents with tool use and memory",
+    category: "infrastructure",
+    tractionSignal: "890 developers",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-02-25",
+    summary: "Fixie provides a cloud platform for building AI agents with tool integrations, long-term memory, and conversational interfaces. Targets developers building customer-facing agent products.",
+    team: "Matt Welsh",
+    teamBackground: "Ex-Google, ex-Harvard CS professor. Deep distributed systems and AI research background.",
+    metrics: { devs: "890", agents: "2,800 deployed", api: "420K calls/mo", ent: "12 enterprise" },
+    whyFlagged: "Strong technical founding team. Monitoring for acceleration in developer adoption and enterprise conversion."
+  },
+  {
+    name: "Morph",
+    slug: "morph",
+    oneLiner: "Data analysis agent that writes SQL, builds dashboards, and finds insights automatically",
+    category: "agent",
+    tractionSignal: "520 companies",
+    signalStrength: 3,
+    stage: "researching",
+    conviction: false,
+    addedDate: "2026-03-02",
+    summary: "Morph is a data analysis agent that connects to databases and data warehouses. Given a business question, it writes SQL, explores the data, builds visualizations, and surfaces insights — with no SQL knowledge required from the user.",
+    team: "Ben Wiedemann",
+    teamBackground: "Former data engineer and BI consultant. Built Morph to solve the data bottleneck he experienced at multiple companies.",
+    metrics: { companies: "520", queries: "48K/mo", dashboards: "1,800 active", nps: "68" },
+    whyFlagged: "High NPS in a category (BI/analytics) with massive existing spend. Monitoring for enterprise traction signals."
   },
   {
     name: "Sweep",
@@ -1375,46 +819,29 @@ const PROJECTS = [
     tractionSignal: "2,800 repos",
     signalStrength: 3,
     stage: "researching",
+    conviction: false,
     addedDate: "2026-03-06",
-    summary: "Sweep is an AI developer tool that converts GitHub issues into pull requests. When you create an issue describing a bug fix or feature, Sweep reads your codebase, plans the changes, writes the code, and opens a PR. It handles the routine engineering work that slows teams down.",
-    team: "William Zeng + Kevin Lu",
-    teamBackground: "Both ex-Anthropic researchers. Deep understanding of code generation and LLM capabilities.",
-    teamLinks: { twitter: "https://x.com/sweep_ai", github: "https://github.com/sweepai" },
-    whyFlagged: "Fair detected Sweep through GitHub integration metrics — the number of repos installing Sweep was accelerating, and the PRs it generated were being merged at a high rate. Merge rate is the ultimate quality signal for code generation tools.",
-    metrics: { repos: "2,800", prs: "18K generated", "merge rate": "64%", mrr: "$16K" },
-    milestones: [
-      { date: "2026-03-10", event: "Merge rate improved to 64% from 48% with new code understanding model", source: "https://x.com/sweep_ai/status/merge-rate" },
-      { date: "2026-02-18", event: "Crossed 2,000 active repos", source: "https://x.com/sweep_ai/status/2k-repos" },
-      { date: "2026-01-30", event: "Launched multi-file editing — Sweep can now modify multiple files in a single PR", source: "https://x.com/sweep_ai/status/multi-file" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Sweep just turned a GitHub issue into a merged PR in 8 minutes. Bug fix across 3 files, tests included. My junior dev couldn't have done it faster.", url: "https://x.com/levie/status/1905284627" },
-      { type: "github", snippet: "sweep: AI-powered GitHub issue to pull request. 7.2K stars, actively maintained.", url: "https://github.com/sweepai/sweep" }
-    ]
+    summary: "Sweep converts GitHub issues into pull requests automatically. It reads the issue, explores the codebase, writes the code change, and opens a PR — handling routine development tasks without human involvement.",
+    team: "William Zeng",
+    teamBackground: "ML engineer and developer tools enthusiast. Built Sweep as open-source, grew via GitHub community.",
+    metrics: { repos: "2,800", prs: "18K generated", merged: "67% rate", stars: "6.2K" },
+    whyFlagged: "Strong open-source traction and high PR merge rate signal utility. Watching for commercial monetization acceleration."
   },
   {
     name: "Reverie Labs",
-    slug: "reverie-labs",
+    slug: "reverie",
     oneLiner: "AI agents for drug discovery — automated molecular design and optimization",
     category: "agent",
     tractionSignal: "3 pharma partnerships",
     signalStrength: 2,
     stage: "scouting",
+    conviction: false,
     addedDate: "2026-03-10",
-    summary: "Reverie Labs uses AI agents to automate drug discovery workflows — from target identification to molecular design to preclinical optimization. Their agents run continuous virtual experiments, designing and testing drug candidates millions of times faster than traditional methods.",
-    team: "Connor Coley + scientific team",
-    teamBackground: "MIT Chemistry PhD. Team includes computational chemists and ML researchers with pharma industry experience.",
-    teamLinks: { twitter: "https://x.com/reverie_labs", github: "https://github.com/reverie-labs" },
-    whyFlagged: "Fair detected Reverie through academic paper monitoring — their agent architecture for molecular design was cited by multiple pharmaceutical research groups. Academic citations from industry labs is a leading indicator of commercial traction.",
-    metrics: { partnerships: "3 top-20 pharma", compounds: "12K designed", candidates: "8 preclinical", funding: "$18M Series A" },
-    milestones: [
-      { date: "2026-03-08", event: "Third pharmaceutical partnership signed — undisclosed top-20 pharma company", source: "https://x.com/reverie_labs/status/pharma-3" },
-      { date: "2026-02-14", event: "First agent-designed compound entered preclinical trials", source: "https://x.com/reverie_labs/status/preclinical" }
-    ],
-    sources: [
-      { type: "article", snippet: "Reverie Labs' AI Agents Design Drug Candidates 1000x Faster Than Traditional Methods", url: "https://nature.com/articles/reverie-drug-discovery" },
-      { type: "tweet", snippet: "Reverie's molecular design agent just found a novel inhibitor that our team of 12 chemists missed. The compound is now in preclinical. Agent-driven drug discovery is real.", url: "https://x.com/drchem_bio/status/1904827361" }
-    ]
+    summary: "Reverie Labs uses AI agents to accelerate drug discovery — automating molecular design, property prediction, and optimization workflows. Partners with pharmaceutical companies to run parallel computational discovery programs.",
+    team: "Kyle Burrill",
+    teamBackground: "Computational chemist with ML expertise. Founded Reverie to translate ML advances in protein modeling to practical drug discovery pipelines.",
+    metrics: { partners: "3 pharma", molecules: "12K designed", hits: "4 preclinical", grants: "$2.1M" },
+    whyFlagged: "Long-cycle sector but massive TAM. Monitoring for additional partnerships and preclinical-to-clinical progression."
   },
   {
     name: "AgentOps",
@@ -1424,21 +851,13 @@ const PROJECTS = [
     tractionSignal: "640 teams",
     signalStrength: 2,
     stage: "scouting",
+    conviction: false,
     addedDate: "2026-03-12",
-    summary: "AgentOps provides monitoring and observability infrastructure for AI agent deployments. It tracks agent behavior, costs, performance, and reliability across complex multi-step workflows. Think Datadog for AI agents.",
-    team: "Alex Reibman + co-founders",
-    teamBackground: "Ex-Datadog and ex-New Relic engineers. Deep expertise in observability infrastructure.",
-    teamLinks: { twitter: "https://x.com/agentopsai", github: "https://github.com/AgentOps-AI" },
-    whyFlagged: "Fair detected AgentOps through a classic infrastructure signal — as agent deployments scale, observability becomes critical. Multiple agent startup founders were asking for 'Datadog for agents' and AgentOps was the most mentioned solution.",
-    metrics: { teams: "640", agents: "3,200 monitored", events: "12M/day", mrr: "$8K" },
-    milestones: [
-      { date: "2026-03-11", event: "Launched cost attribution — track spend per agent, per task, per model", source: "https://x.com/agentops_ai/status/cost-tracking" },
-      { date: "2026-02-28", event: "Crossed 500 teams monitoring agents on the platform", source: "https://x.com/agentops_ai/status/500-teams" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "We were spending $4K/day on agent API calls and couldn't figure out why. @AgentOps showed us that 40% of spend was on retried tool calls. Fixed in a day.", url: "https://x.com/jaspar_ai/status/1905384726" },
-      { type: "github", snippet: "agentops-python: Python SDK for agent observability. 2.8K stars.", url: "https://github.com/AgentOps-AI/agentops" }
-    ]
+    summary: "AgentOps provides logging, tracing, replay, and monitoring for AI agent systems. As agents move to production, teams need observability tooling — AgentOps is building the Datadog for agent infrastructure.",
+    team: "Alex Volkov",
+    teamBackground: "Developer advocate and AI tooling builder. Strong community presence in the AI developer ecosystem.",
+    metrics: { teams: "640", events: "8M logged/mo", sessions: "140K/mo", oss: "1.8K stars" },
+    whyFlagged: "Early positioning in a category that will become critical infrastructure as agents move to production."
   },
   {
     name: "Questflow",
@@ -1448,21 +867,13 @@ const PROJECTS = [
     tractionSignal: "180 workflows",
     signalStrength: 2,
     stage: "scouting",
+    conviction: false,
     addedDate: "2026-03-14",
-    summary: "Questflow is building a decentralized marketplace where users can discover, deploy, and compose autonomous agent workflows. Agent creators publish workflows, users pay per execution, and the protocol handles coordination and payment settlement on-chain.",
-    team: "Victor Yu + co-founders",
-    teamBackground: "Previously built workflow automation tools. Combines DeFi protocol experience with enterprise automation expertise.",
-    teamLinks: { twitter: "https://x.com/questflow", github: "https://github.com/questflow" },
-    whyFlagged: "Fair detected Questflow through DeFi protocol analysis — a new pattern of agent-marketplace contracts was appearing on-chain. The concept of agent workflow marketplaces is early but represents a potential infrastructure layer for the agent economy.",
-    metrics: { workflows: "180 published", executions: "4,200/mo", creators: "45", tvl: "$89K" },
-    milestones: [
-      { date: "2026-03-12", event: "Launched creator incentive program — top workflow creators earn protocol tokens", source: "https://x.com/questflow/status/creator-program" },
-      { date: "2026-02-28", event: "First 100 workflows published on the marketplace", source: "https://x.com/questflow/status/100-workflows" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "Questflow is like the App Store for AI agent workflows. You browse, pick a workflow, and it runs autonomously. Still early but the marketplace model for agents is interesting.", url: "https://x.com/cdixon/status/1905483627" },
-      { type: "farcaster", snippet: "Agent marketplaces are where the action will be in 6 months. @questflow is the first credible attempt at this.", url: "https://warpcast.com/balaji/0x6d2c8e" }
-    ]
+    summary: "Questflow is a decentralized marketplace where developers publish autonomous agent workflows and earn token rewards when they are used. It aims to create a composable ecosystem of verified, monetizable agent primitives.",
+    team: "Steve Ng",
+    teamBackground: "DeFi and Web3 protocol builder. Background in token mechanism design and developer ecosystems.",
+    metrics: { workflows: "180", uses: "2,400/mo", tokens: "$180K staked", devs: "320 publishers" },
+    whyFlagged: "Interesting token-incentive model for agent marketplace. Very early — watching for developer liquidity and workflow quality signals."
   },
   {
     name: "LangSmith",
@@ -1472,366 +883,161 @@ const PROJECTS = [
     tractionSignal: "4,200 teams",
     signalStrength: 2,
     stage: "scouting",
+    conviction: false,
     addedDate: "2026-03-15",
-    summary: "LangSmith provides testing, monitoring, and evaluation infrastructure for LLM applications. Built by the LangChain team, it helps developers debug prompt chains, evaluate model outputs, and monitor production LLM apps. It's the observability layer for the LangChain ecosystem.",
-    team: "Harrison Chase + LangChain team",
-    teamBackground: "Harrison Chase created LangChain, the most widely used framework for building LLM applications. Team of 40+ engineers.",
-    teamLinks: { twitter: "https://x.com/LangChainAI", github: "https://github.com/langchain-ai" },
-    whyFlagged: "Fair tracks LangSmith as a proxy for the overall agent development ecosystem. Its adoption numbers reflect the broader growth of agent tooling. Currently scouting-stage because the competitive landscape for LLM observability is crowded.",
-    metrics: { teams: "4,200", traces: "1.2B logged", evaluations: "890K run", mrr: "$180K" },
-    milestones: [
-      { date: "2026-03-10", event: "Launched automated evaluation pipelines — continuous testing for LLM apps", source: "https://x.com/LangChainAI/status/auto-eval" },
-      { date: "2026-02-20", event: "Crossed 1 billion logged traces", source: "https://x.com/LangChainAI/status/1b-traces" }
-    ],
-    sources: [
-      { type: "tweet", snippet: "LangSmith just passed 1 billion logged traces. The LLM observability market is massive and still early.", url: "https://x.com/hwchase17/status/1905283746" },
-      { type: "blog", snippet: "Building Reliable AI Agents: How LangSmith's Evaluation Framework Catches Regressions Before Production", url: "https://blog.langchain.dev/langsmith-eval-framework" }
-    ]
+    summary: "LangSmith is LangChain's enterprise platform for testing, debugging, evaluating, and monitoring LLM applications. It provides dataset management, regression testing, trace inspection, and production monitoring.",
+    team: "Harrison Chase",
+    teamBackground: "Creator of LangChain, the most widely adopted LLM orchestration framework. Strong developer distribution.",
+    metrics: { teams: "4,200", traces: "180M logged", evals: "2.4M/mo", ent: "85 enterprise" },
+    whyFlagged: "Largest developer distribution in LLM tooling. Watching for revenue acceleration and potential infrastructure lock-in."
   }
 ];
 
-// ════════════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════════════
-let state = {
-  stageFilter: 'all',
-  categoryFilter: 'all',
-  sortBy: 'signal',
-  showFullFunnel: false,
-  openProject: null,
-  brand: 'fair'
-};
+// ════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════
+const CAT_LABELS = { agent: "Agent", infrastructure: "Infra", tool: "Tool", protocol: "Protocol" };
+const CAT_CLASS  = { agent: "cat-agent", infrastructure: "cat-infra", tool: "cat-tool", protocol: "cat-protocol" };
 
-// ════════════════════════════════════════════════════════════
-// TIBBIR BRAND SWAP
-// ════════════════════════════════════════════════════════════
-function detectBrand() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('brand') === 'tibbir') {
-    state.brand = 'tibbir';
-    applyTibbirBrand();
-  }
-}
-
-function applyTibbirBrand() {
-  const r = document.documentElement.style;
-  r.setProperty('--primary', '#1a8a4a');
-  r.setProperty('--primary-dim', 'rgba(26, 138, 74, 0.06)');
-  r.setProperty('--primary-border', '#157a3e');
-  r.setProperty('--purple', '#0d6e3f');
-  r.setProperty('--purple-dim', 'rgba(13, 110, 63, 0.06)');
-  r.setProperty('--purple-border', '#0a5c34');
-
-  document.getElementById('nav-brand-text').textContent = 'Tibbir';
-  document.getElementById('page-title').textContent = 'Tibbir Agent Pipeline';
-  document.getElementById('footer-brand').textContent = 'Tibbir';
-  document.getElementById('footer-tagline').textContent = 'AGENT PIPELINE · TIBBIR SCOUTING ENGINE v1';
-
-  const navBrand = document.querySelector('.nav-brand span');
-  navBrand.style.background = 'linear-gradient(135deg, #1a8a4a 0%, #0d6e3f 100%)';
-  navBrand.style.webkitBackgroundClip = 'text';
-  navBrand.style.webkitTextFillColor = 'transparent';
-
-  const footerBrand = document.getElementById('footer-brand');
-  footerBrand.style.background = 'linear-gradient(135deg, #1a8a4a, #0d6e3f)';
-  footerBrand.style.webkitBackgroundClip = 'text';
-  footerBrand.style.webkitTextFillColor = 'transparent';
-
-  document.querySelectorAll('.kpi-value').forEach(el => {
-    el.style.background = 'linear-gradient(140deg, #0c1024 0%, #1a8a4a 80%)';
-    el.style.webkitBackgroundClip = 'text';
-    el.style.webkitTextFillColor = 'transparent';
-  });
-
-  document.querySelectorAll('.section-header').forEach(el => {
-    el.style.borderImage = 'linear-gradient(180deg, #1a8a4a 0%, #0d6e3f 100%) 1';
-  });
-
-  document.body.style.backgroundImage =
-    'radial-gradient(ellipse 1200px 800px at 50% -100px, rgba(26, 138, 74, 0.07) 0%, transparent 70%),' +
-    'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.04) 1px, transparent 0)';
-}
-
-// ════════════════════════════════════════════════════════════
-// RENDERING
-// ════════════════════════════════════════════════════════════
-function getFilteredProjects() {
-  let projects = [...PROJECTS];
-
-  if (state.stageFilter !== 'all') {
-    projects = projects.filter(p => p.stage === state.stageFilter);
-  }
-
-  if (state.categoryFilter !== 'all') {
-    projects = projects.filter(p => p.category === state.categoryFilter);
-  }
-
-  // Hide scouting unless explicitly filtered or full funnel shown
-  if (!state.showFullFunnel && state.stageFilter === 'all') {
-    projects = projects.filter(p => p.stage !== 'scouting');
-  }
-
-  if (state.sortBy === 'signal') {
-    projects.sort((a, b) => b.signalStrength - a.signalStrength || a.name.localeCompare(b.name));
-  } else if (state.sortBy === 'recent') {
-    projects.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
-  } else if (state.sortBy === 'alpha') {
-    projects.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  return projects;
-}
-
-function getInitials(name) {
-  return name.split(/[\s.]+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
-}
-
-function renderSignalDots(strength, large) {
-  const cls = large ? 'panel-signal-dots' : 'signal-dots';
-  let h = '<div class="' + cls + '">';
+function dots(n) {
+  let s = '';
   for (let i = 1; i <= 5; i++) {
-    h += '<div class="signal-dot' + (i <= strength ? ' filled' : '') + '"></div>';
+    s += `<span class="${i <= n ? 'dot-on' : 'dot-off'}">●</span>`;
   }
-  return h + '</div>';
+  return `<span class="signal-dots">${s}</span>`;
 }
 
-function renderProjectCard(project) {
-  return '<div class="project-card" data-slug="' + project.slug + '">' +
-    '<div class="project-card-header">' +
-      '<div class="project-icon">' + getInitials(project.name) + '</div>' +
-      '<div>' +
-        '<h3>' + project.name + '</h3>' +
-        '<div class="project-category">' + project.category.toUpperCase() + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="project-oneliner">' + project.oneLiner + '</div>' +
-    '<div class="project-card-footer">' +
-      '<div class="project-card-meta">' +
-        '<span class="traction-signal">' + project.tractionSignal + '</span>' +
-        renderSignalDots(project.signalStrength) +
-      '</div>' +
-      '<span class="stage-badge ' + project.stage + '">' + project.stage + '</span>' +
-    '</div>' +
-  '</div>';
+function stageBadge(s) {
+  const labels = { invested: "Invested", candidate: "Candidate", researching: "Researching", scouting: "Scouting" };
+  return `<span class="stage-badge stage-${s}">${labels[s] || s}</span>`;
 }
 
-function renderGrid() {
-  const projects = getFilteredProjects();
-  const grid = document.getElementById('projects-grid');
-  if (projects.length === 0) {
-    grid.innerHTML = '<div class="empty-state">No projects match the current filters.</div>';
-  } else {
-    grid.innerHTML = projects.map(renderProjectCard).join('');
-  }
+function formatDate(d) {
+  const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const [y,m,dd] = d.split('-');
+  return `${months[parseInt(m)-1]} ${dd}`;
+}
 
-  // Attach click handlers
-  grid.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('click', function() {
-      openPanel(this.dataset.slug);
-    });
+function buildMetricsHTML(p) {
+  if (!p.metrics) return '';
+  const entries = Object.entries(p.metrics);
+  return `<div class="detail-metrics">${entries.map(([k,v]) => `
+    <div class="detail-metric-item">
+      <span class="detail-metric-v">${v}</span>
+      <span class="detail-metric-l">${k}</span>
+    </div>`).join('')}</div>`;
+}
+
+let expandedSlug = null;
+let activeStage = 'all';
+let activeCat = 'all';
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  let rank = 0;
+  let visible = 0;
+
+  PROJECTS.forEach((p, i) => {
+    const stageMatch = activeStage === 'all' || p.stage === activeStage;
+    const catMatch   = activeCat === 'all'   || p.category === activeCat;
+    const show = stageMatch && catMatch;
+    if (show) { rank++; visible++; }
+
+    // main row
+    const tr = document.createElement('tr');
+    tr.dataset.slug = p.slug;
+    tr.dataset.stage = p.stage;
+    tr.dataset.cat = p.category;
+    if (p.conviction) tr.classList.add('conviction-high');
+    if (!show) tr.classList.add('filtered');
+    if (expandedSlug === p.slug) tr.classList.add('expanded');
+
+    tr.innerHTML = `
+      <td class="star-col ${p.conviction ? 'high' : ''}">${p.conviction ? '★' : ''}</td>
+      <td class="rank-col">${show ? rank : ''}</td>
+      <td class="name-col"><span class="company-name">${p.name}</span></td>
+      <td class="desc-col">${p.oneLiner}</td>
+      <td class="cat-col"><span class="cat-badge ${CAT_CLASS[p.category]}">${CAT_LABELS[p.category]}</span></td>
+      <td class="stage-col">${stageBadge(p.stage)}</td>
+      <td class="signal-col">${dots(p.signalStrength)}</td>
+      <td class="traction-col">${p.tractionSignal}</td>
+      <td class="team-col">${p.team}</td>
+      <td class="date-col">${formatDate(p.addedDate)}</td>
+      <td class="expand-col">▶</td>
+    `;
+
+    tr.addEventListener('click', () => toggleDetail(p.slug));
+    tbody.appendChild(tr);
+
+    // detail row
+    const dtr = document.createElement('tr');
+    dtr.classList.add('detail-row');
+    if (expandedSlug !== p.slug) dtr.classList.add('hidden');
+    if (!show) dtr.classList.add('filtered');
+
+    dtr.innerHTML = `<td colspan="11">
+      <div class="detail-panel">
+        <div class="detail-section">
+          <h4>Overview</h4>
+          <p>${p.summary}</p>
+        </div>
+        <div class="detail-section">
+          <h4>Metrics</h4>
+          ${buildMetricsHTML(p)}
+        </div>
+        <div class="detail-section">
+          <h4>Why Flagged</h4>
+          <p>${p.whyFlagged}</p>
+          <h4 style="margin-top:14px;">Team</h4>
+          <p><strong style="color:var(--text)">${p.team}</strong> — ${p.teamBackground}</p>
+        </div>
+      </div>
+    </td>`;
+    tbody.appendChild(dtr);
   });
 
-  document.getElementById('project-count').textContent = 'Showing ' + projects.length + ' project' + (projects.length !== 1 ? 's' : '');
+  document.getElementById('record-count').textContent = `${visible} companies`;
+  document.getElementById('kpi-total').textContent = PROJECTS.length;
 }
 
-function formatDate(dateStr) {
-  var d = new Date(dateStr + 'T00:00:00');
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+function toggleDetail(slug) {
+  expandedSlug = expandedSlug === slug ? null : slug;
+  renderTable();
 }
 
-function truncateUrl(url) {
-  var s = url.replace(/https?:\/\//, '');
-  return s.length > 42 ? s.substring(0, 42) + '...' : s;
-}
-
-function renderPanel(project) {
-  var panelIcon = document.getElementById('panel-icon');
-  var panelName = document.getElementById('panel-name');
-  var panelCategory = document.getElementById('panel-category');
-  var panelBody = document.getElementById('panel-body');
-
-  panelIcon.textContent = getInitials(project.name);
-  panelName.textContent = project.name;
-  panelCategory.textContent = project.category.toUpperCase();
-
-  var html = '';
-
-  // Stage + Signal row
-  html += '<div class="panel-stage-row">';
-  html += '<span class="stage-badge ' + project.stage + '" style="font-size:11px;padding:5px 12px;">' + project.stage + '</span>';
-  html += '<div class="panel-signal-group">';
-  html += '<span class="panel-signal-label">Signal</span>';
-  html += renderSignalDots(project.signalStrength, true);
-  html += '</div>';
-  html += '<span class="traction-signal" style="font-size:11px;">' + project.tractionSignal + '</span>';
-  html += '</div>';
-
-  // Summary
-  html += '<div class="panel-section">';
-  html += '<div class="panel-section-header"><div class="section-accent"></div>Summary</div>';
-  html += '<div class="panel-prose"><p>' + project.summary + '</p></div>';
-  html += '<div class="panel-team"><strong>' + project.team + '</strong> — ' + project.teamBackground;
-  if (project.teamLinks) {
-    html += '<div class="team-links">';
-    for (var platform in project.teamLinks) {
-      html += '<a href="' + project.teamLinks[platform] + '" target="_blank" class="team-link">' + platform.toUpperCase() + '</a>';
-    }
-    html += '</div>';
-  }
-  html += '</div></div>';
-
-  // Why Fair flagged
-  html += '<div class="panel-section">';
-  html += '<div class="panel-section-header"><div class="section-accent"></div>Why Fair Flagged This</div>';
-  html += '<div class="panel-insight">';
-  html += '<div class="panel-insight-label">Fair Reasoning</div>';
-  html += '<p>' + project.whyFlagged + '</p>';
-  html += '</div></div>';
-
-  // Metrics
-  if (project.metrics) {
-    var entries = Object.entries(project.metrics);
-    html += '<div class="panel-section">';
-    html += '<div class="panel-section-header"><div class="section-accent"></div>Traction & Metrics</div>';
-    html += '<div class="metrics-grid">';
-    entries.forEach(function(entry) {
-      var key = entry[0], val = entry[1];
-      var label = key.replace(/([A-Z])/g, ' $1').trim();
-      html += '<div class="metric-item">';
-      html += '<div class="metric-value">' + val + '</div>';
-      html += '<div class="metric-label">' + label.toUpperCase() + '</div>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  // Milestones
-  if (project.milestones && project.milestones.length) {
-    html += '<div class="panel-section">';
-    html += '<div class="panel-section-header"><div class="section-accent"></div>Key Updates</div>';
-    html += '<div class="timeline">';
-    project.milestones.forEach(function(m, i) {
-      html += '<div class="timeline-entry' + (i === 0 ? ' milestone' : '') + '">';
-      html += '<div class="timeline-date">' + formatDate(m.date) + '</div>';
-      html += '<div class="timeline-event">' + m.event + '</div>';
-      if (m.source) {
-        html += '<a href="' + m.source + '" target="_blank" class="timeline-source">' + truncateUrl(m.source) + '</a>';
-      }
-      html += '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  // Sources
-  if (project.sources && project.sources.length) {
-    html += '<div class="panel-section">';
-    html += '<div class="panel-section-header"><div class="section-accent"></div>Sources</div>';
-    html += '<div class="source-list">';
-    project.sources.forEach(function(s) {
-      html += '<div class="source-item">';
-      html += '<div class="source-item-header">';
-      html += '<span class="source-type-tag ' + s.type + '">' + s.type.toUpperCase() + '</span>';
-      html += '</div>';
-      html += '<div class="source-snippet">"' + s.snippet + '"</div>';
-      html += '<a href="' + s.url + '" target="_blank" class="source-link">' + s.url + '</a>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  panelBody.innerHTML = html;
-}
-
-// ════════════════════════════════════════════════════════════
-// PANEL OPEN / CLOSE
-// ════════════════════════════════════════════════════════════
-function openPanel(slug) {
-  var project = PROJECTS.find(function(p) { return p.slug === slug; });
-  if (!project) return;
-  state.openProject = slug;
-  renderPanel(project);
-  document.getElementById('detail-panel').classList.add('open');
-  document.getElementById('panel-backdrop').classList.add('open');
-  document.getElementById('projects-grid').classList.add('dimmed');
-  document.body.style.overflow = 'hidden';
-}
-
-function closePanel() {
-  state.openProject = null;
-  document.getElementById('detail-panel').classList.remove('open');
-  document.getElementById('panel-backdrop').classList.remove('open');
-  document.getElementById('projects-grid').classList.remove('dimmed');
-  document.body.style.overflow = '';
-}
-
-// ════════════════════════════════════════════════════════════
-// EVENT LISTENERS
-// ════════════════════════════════════════════════════════════
-function initFilters() {
-  // Stage filters
-  document.querySelectorAll('#stage-filters .filter-pill').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#stage-filters .filter-pill').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.stageFilter = btn.dataset.stage;
-      renderGrid();
-    });
+// ── FILTERS ──
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeStage = btn.dataset.filter;
+    renderTable();
   });
-
-  // Category filters
-  document.querySelectorAll('#category-filters .filter-pill').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#category-filters .filter-pill').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.categoryFilter = btn.dataset.category;
-      renderGrid();
-    });
-  });
-
-  // Sort buttons
-  document.querySelectorAll('.sort-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.sort-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.sortBy = btn.dataset.sort;
-      renderGrid();
-    });
-  });
-
-  // Full funnel toggle
-  document.getElementById('funnel-toggle').addEventListener('click', function() {
-    state.showFullFunnel = !state.showFullFunnel;
-    var btn = document.getElementById('funnel-toggle');
-    if (state.showFullFunnel) {
-      btn.classList.add('active');
-      btn.textContent = 'Hide scouting';
-    } else {
-      btn.classList.remove('active');
-      btn.textContent = 'Show full funnel';
-    }
-    renderGrid();
-  });
-
-  // Panel close
-  document.getElementById('panel-close').addEventListener('click', closePanel);
-  document.getElementById('panel-backdrop').addEventListener('click', closePanel);
-
-  // Escape key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && state.openProject) closePanel();
-  });
-}
-
-// ════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', function() {
-  detectBrand();
-  initFilters();
-  renderGrid();
 });
-</script>
 
+document.querySelectorAll('[data-cat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    renderTable();
+  });
+});
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── INIT ──
+renderTable();
+</script>
 </body>
 </html>
