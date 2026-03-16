@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fair — Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface2: #f0f2f7;
+  --border: rgba(0,0,0,0.07);
+  --border-bright: rgba(0,0,0,0.12);
+  --text: #0c1024;
+  --text-dim: #5a6378;
+  --text-muted: #8e96a8;
+  --primary: #4f46e5;
+  --purple: #7c3aed;
+  --cyan: #0891b2;
+  --green: #059669;
+  --radius: 12px;
+  --font: 'DM Sans', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-links a:hover { color: var(--text-dim); background: var(--surface2); }
+.nav-links a.active { color: var(--text); background: var(--surface2); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.engine-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.engine-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── TRACK TABS + TOOLBAR ── */
+.toolbar-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.track-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.track-tab {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 6px 0;
+  cursor: pointer;
+  font-family: var(--font);
+  position: relative;
+  transition: color 0.15s;
+}
+
+.track-tab:hover { color: var(--text-dim); }
+
+.track-tab.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.track-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+}
+
+.track-tab .tab-count {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+
+.track-tab.active .tab-count {
+  color: var(--text-dim);
+}
+
+.track-sep {
+  margin: 0 14px;
+  font-size: 13px;
+  color: var(--border-bright);
+  user-select: none;
+}
+
+.toolbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  position: relative;
+}
+
+.filter-btn:hover { border-color: var(--text-muted); color: var(--text-dim); }
+
+.filter-btn svg { width: 13px; height: 13px; }
+
+.filter-btn .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.filter-btn .badge.visible { opacity: 1; transform: scale(1); }
+
+.project-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+}
+
+/* ── FILTER ROW ── */
+.filter-row {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, padding-top 0.25s ease, padding-bottom 0.25s ease;
+}
+
+.filter-row.open {
+  max-height: 80px;
+  padding-top: 10px;
+  padding-bottom: 4px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-group + .filter-group { margin-top: 6px; }
+
+.filter-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+  min-width: 60px;
+}
+
+.pill {
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.pill:hover { border-color: var(--text-muted); color: var(--text-dim); }
+
+.pill.active {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+/* ── PIPELINE LIST ── */
+.pipeline {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── PROJECT CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px 20px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  border-color: var(--border-bright);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.card-name {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.card-founder {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: var(--mono);
+  letter-spacing: 0.01em;
+}
+
+.stage-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.stage-scouting { background: rgba(142,150,168,0.1); color: #8e96a8; }
+.stage-scouting .dot { background: #8e96a8; }
+
+.stage-researching { background: rgba(8,145,178,0.08); color: #0891b2; }
+.stage-researching .dot { background: #0891b2; }
+
+.stage-candidate { background: rgba(124,58,237,0.08); color: #7c3aed; }
+.stage-candidate .dot { background: #7c3aed; }
+
+.stage-invested { background: rgba(79,70,229,0.08); color: #4f46e5; }
+.stage-invested .dot { background: #4f46e5; }
+
+.card-category {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.card-tag {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+.card-spacer {
+  margin-left: auto;
+}
+
+.conviction {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.conviction-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.conviction-dot.empty {
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+}
+
+.card-oneliner {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  margin: 4px 0 12px;
+  line-height: 1.5;
+}
+
+.card-body {
+  display: flex;
+  gap: 24px;
+}
+
+.card-bullets {
+  flex: 0 0 60%;
+  min-width: 0;
+}
+
+.card-bullets ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-bullets li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  padding: 2px 0;
+  position: relative;
+  padding-left: 14px;
+}
+
+.card-bullets li::before {
+  content: '\2022';
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.card-milestones {
+  flex: 0 0 40%;
+  min-width: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--border);
+}
+
+.milestone {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.milestone:last-child { padding-bottom: 0; }
+
+.milestone-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 10px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.milestone-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.milestone-dot.planned {
+  background: transparent;
+  border: 1.5px solid var(--text-muted);
+}
+
+.milestone-line {
+  width: 1px;
+  flex: 1;
+  background: var(--border-bright);
+  margin-top: 3px;
+}
+
+.milestone:last-child .milestone-line { display: none; }
+
+.milestone-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0;
+}
+
+.milestone-date {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.milestone-date .planned-tag {
+  font-family: var(--font);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--surface2);
+  padding: 0 5px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+.milestone-text {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+.milestone-via {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  text-decoration: none;
+  margin-left: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.milestone-via:hover { color: var(--primary); text-decoration: underline; }
+
+/* ── DETAIL PANEL ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 42%;
+  min-width: 380px;
+  max-width: 560px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
+  overflow-y: auto;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.06);
+}
+
+.panel.open { transform: translateX(0); }
+
+.panel-inner { padding: 28px 28px 60px; }
+
+.panel-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.panel-close:hover { border-color: var(--text-muted); color: var(--text); }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+  padding-right: 36px;
+}
+
+.panel-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.panel-founder {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.panel-tag {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.panel-oneliner {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.panel-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 28px 0 12px;
+}
+
+.panel-bullets ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.panel-bullets li {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+  padding: 3px 0;
+  position: relative;
+  padding-left: 16px;
+}
+
+.panel-bullets li::before {
+  content: '\2022';
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.panel-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.panel-milestone {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 12px;
+  position: relative;
+}
+
+.panel-milestone:last-child { padding-bottom: 0; }
+
+.panel-milestone .milestone-track { padding-top: 4px; }
+
+.panel-milestone .milestone-text {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.panel-feed-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-feed-item:last-child { border-bottom: none; }
+
+.feed-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.feed-date {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.feed-source-tag {
+  font-size: 10.5px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--surface2);
+}
+
+.feed-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.feed-text a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+.feed-text a:hover { text-decoration: underline; color: var(--primary); }
+
+/* ── HIDDEN CARD ── */
+.card.hidden {
+  display: none;
+}
+
+/* ── CONVICTION COLORS ── */
+.conv-1, .conv-2 { background: #c4c9d4; }
+.conv-3 { background: var(--cyan); }
+.conv-4 { background: var(--purple); }
+.conv-5 { background: var(--primary); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .nav-inner { padding: 0 16px; gap: 16px; }
+  .nav-links a { font-size: 12.5px; padding: 6px 8px; }
+  .pipeline { padding: 12px 16px 60px; }
+  .card { padding: 16px; }
+  .card-body { flex-direction: column; gap: 14px; }
+  .card-bullets { flex: 1; }
+  .card-milestones { flex: 1; padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 14px; }
+  .panel { width: 100%; min-width: 0; max-width: 100%; }
+  .toolbar-container { flex-wrap: wrap; gap: 8px; }
+  .toolbar-right { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">Fair</div>
+    <div class="nav-links">
+      <a href="#">Overview</a>
+      <a href="#" class="active">Pipeline</a>
+      <a href="#">Portfolio</a>
+      <a href="#">Thesis</a>
+    </div>
+    <div class="nav-right">
+      <div class="engine-status">
+        <span class="engine-dot"></span>
+        <span>Engine running</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- TRACK TABS + TOOLBAR -->
+<div class="toolbar-container">
+  <div class="track-tabs">
+    <button class="track-tab active" id="tabNewCompanies" onclick="switchTrack('new')">New Companies <span class="tab-count" id="countNew"></span></button>
+    <span class="track-sep">&middot;</span>
+    <button class="track-tab" id="tabInfra" onclick="switchTrack('infra')">Infrastructure <span class="tab-count" id="countInfra"></span></button>
+  </div>
+  <div class="toolbar-right">
+    <button class="filter-btn" id="filterToggle" onclick="toggleFilters()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="2" y1="4" x2="14" y2="4"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="6" y1="12" x2="10" y2="12"/>
+      </svg>
+      Filters
+      <span class="badge" id="filterBadge">0</span>
+    </button>
+    <span class="project-count" id="projectCount"></span>
+  </div>
+</div>
+
+<!-- FILTER ROW -->
+<div class="filter-row" id="filterRow">
+  <div class="filter-group">
+    <span class="filter-label">Stage</span>
+    <button class="pill active" data-filter="stage" data-value="all" onclick="setFilter(this)">All</button>
+    <button class="pill" data-filter="stage" data-value="Scouting" onclick="setFilter(this)">Scouting</button>
+    <button class="pill" data-filter="stage" data-value="Researching" onclick="setFilter(this)">Researching</button>
+    <button class="pill" data-filter="stage" data-value="Candidate" onclick="setFilter(this)">Candidate</button>
+    <button class="pill" data-filter="stage" data-value="Invested" onclick="setFilter(this)">Invested</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Category</span>
+    <button class="pill active" data-filter="category" data-value="all" onclick="setFilter(this)">All</button>
+    <button class="pill" data-filter="category" data-value="Agent" onclick="setFilter(this)">Agent</button>
+    <button class="pill" data-filter="category" data-value="Infrastructure" onclick="setFilter(this)">Infra</button>
+    <button class="pill" data-filter="category" data-value="Protocol" onclick="setFilter(this)">Protocol</button>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="pipeline" id="pipeline"></div>
+
+<!-- OVERLAY + PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <button class="panel-close" onclick="closePanel()">&times;</button>
+  <div class="panel-inner" id="panelContent"></div>
+</div>
+
+<script>
+// ── DATA ──
+
+const newCompanies = [
+  {
+    id: 'felix',
+    name: 'Felix',
+    founder: 'Nat Eliason',
+    category: 'Agent',
+    stage: 'Candidate',
+    signal: 4,
+    oneLiner: 'Autonomous crypto trading agent \u2014 $2.1M AUM, +38% returns',
+    bullets: [
+      'Autonomous crypto trading agent — executes DEX strategies across Uniswap and GMX, fully on-chain',
+      'Built by Nat Eliason (200K+ audience) — content flywheel is the distribution moat',
+      '$2.1M AUM, +38% returns in 3 months, 4.2K trades, 1,400 waitlist',
+      'On-chain transparency dashboard — performance is verifiable, not self-reported'
+    ],
+    milestones: [
+      { text: 'Managed fund for accredited investors', date: 'Apr 2026', source: '@nateliason', url: 'https://x.com/nateliason', planned: true },
+      { text: 'AUM crossed $2M, waitlist 1,400', date: 'Mar 2026', source: '@nateliason', url: 'https://x.com/nateliason' },
+      { text: '+38% cumulative return since launch', date: 'Feb 2026', source: 'felix.trade', url: 'https://felix.trade/performance' },
+      { text: 'Arbitrum + Base DEX support', date: 'Jan 2026', source: 'felix.trade', url: 'https://felix.trade' },
+      { text: 'Public launch + on-chain dashboard', date: 'Dec 2025', source: '@nateliason', url: 'https://x.com/nateliason' },
+    ],
+    feed: [
+      { date: 'Mar 13', source: 'Twitter', text: 'Monthly update: +12% in Feb, outperforming ETH by 18%', url: 'https://x.com/nateliason' },
+      { date: 'Mar 9', source: 'Substack', text: 'Risk management deep-dive \u2014 14K reads in 48h', url: 'https://nateliason.substack.com' },
+      { date: 'Mar 5', source: 'On-chain', text: '340 trades last 7 days across Uniswap + GMX', url: 'https://felix.trade/performance' },
+    ],
+  },
+  {
+    id: 'clanker',
+    name: 'Clanker',
+    founder: null,
+    category: 'Agent',
+    stage: 'Candidate',
+    signal: 5,
+    oneLiner: 'Autonomous token deployer on Base \u2014 $8M protocol fees in single week',
+    bullets: [
+      'Autonomous token deployer — tag @clanker with a concept, token goes live on Base automatically',
+      'Zero-human operation: contract deployment, liquidity seeding, metadata — fully autonomous',
+      '$8M protocol fees in a single week, de facto launch agent for Farcaster ecosystem',
+      'Network effects compounding — 1,000+ tokens deployed, becoming default agent for token launches'
+    ],
+    milestones: [
+      { text: 'Multi-chain deployment (Ethereum mainnet)', date: 'Apr 2026', source: '@clanker', url: 'https://x.com/clanker', planned: true },
+      { text: '$8M protocol fees in single week', date: 'Mar 2026', source: 'Dune', url: 'https://dune.com' },
+      { text: 'Integrated with Farcaster Frames v2', date: 'Feb 2026', source: '@clanker', url: 'https://x.com/clanker' },
+      { text: '1,000+ tokens deployed autonomously', date: 'Jan 2026', source: 'Dune', url: 'https://dune.com' },
+    ],
+    feed: [
+      { date: 'Mar 14', source: 'Twitter', text: 'Peak week: $8M in fees from autonomous deployments', url: 'https://x.com/clanker' },
+      { date: 'Mar 10', source: 'Farcaster', text: '@clanker usage trending #1 in /base channel', url: 'https://warpcast.com' },
+    ],
+  },
+  {
+    id: 'botto',
+    name: 'Botto',
+    founder: null,
+    category: 'Agent',
+    stage: 'Candidate',
+    signal: 4,
+    oneLiner: 'Autonomous AI artist \u2014 $6M+ cumulative revenue, Sotheby\'s validated',
+    bullets: [
+      'Autonomous AI artist — generates art, community curates via governance votes, agent sells',
+      'Validated by Sotheby\'s auction house — highest sale price for AI-generated art',
+      '$6M+ cumulative revenue sustained over 2+ years — rare durability for AI × crypto',
+      'Decentralized curation model — token holders direct creative output and share upside'
+    ],
+    milestones: [
+      { text: 'Physical gallery partnership announced', date: 'Apr 2026', source: '@bottoproject', url: 'https://x.com/bottoproject', planned: true },
+      { text: '$6M+ cumulative sales', date: 'Mar 2026', source: '@bottoproject', url: 'https://x.com/bottoproject' },
+      { text: 'Sotheby\'s auction \u2014 highest sale for AI art', date: 'Jan 2026', source: 'Sothebys.com', url: 'https://sothebys.com' },
+    ],
+    feed: [
+      { date: 'Mar 11', source: 'Twitter', text: 'New epoch started \u2014 4,200 community votes in first 24h', url: 'https://x.com/bottoproject' },
+    ],
+  },
+  {
+    id: 'clawd',
+    name: 'Clawd',
+    founder: 'Austin Griffith',
+    category: 'Agent',
+    stage: 'Researching',
+    signal: 4,
+    oneLiner: 'Smart contract shipping agent \u2014 14 live dApps, $7M market cap',
+    bullets: [
+      'Autonomous smart contract agent — writes, tests, and deploys dApps to production without humans',
+      'Built by Austin Griffith (Ethereum Foundation) — one of the most credible builders in ETH',
+      '14 live dApps deployed autonomously, all verifiable on-chain, $7M market cap',
+      'Open-source framework — growing developer community building on top'
+    ],
+    milestones: [
+      { text: '14 live dApps deployed autonomously', date: 'Mar 2026', source: '@austingriffith', url: 'https://x.com/austingriffith' },
+      { text: 'Multi-chain deployment support', date: 'Feb 2026', source: 'GitHub', url: 'https://github.com/austingriffith' },
+      { text: 'Open-source agent framework release', date: 'Jan 2026', source: 'GitHub', url: 'https://github.com/austingriffith' },
+    ],
+    feed: [
+      { date: 'Mar 8', source: 'Twitter', text: 'Clawd deployed 3 new contracts this week \u2014 all verified and functional', url: 'https://x.com/austingriffith' },
+    ],
+  },
+  {
+    id: 'aixbt',
+    name: 'aixbt by Virtuals',
+    founder: null,
+    category: 'Agent',
+    stage: 'Researching',
+    signal: 4,
+    oneLiner: 'Crypto intelligence agent \u2014 460K X followers, 600K+ token holders',
+    bullets: [
+      'Autonomous crypto intelligence agent — analyzes markets, posts insights, tracks narratives 24/7',
+      'Built on Virtuals Protocol — tokenized with own treasury and revenue stream',
+      '460K X followers, 600K+ token holders — largest social following of any AI agent',
+      'Revenue from token activity + premium signal tier — sustained engagement, not hype-dependent'
+    ],
+    milestones: [
+      { text: '460K X followers, largest AI agent account', date: 'Mar 2026', source: '@aixbt_agent', url: 'https://x.com/aixbt_agent' },
+      { text: 'Premium signal tier launched', date: 'Feb 2026', source: '@aixbt_agent', url: 'https://x.com/aixbt_agent' },
+      { text: '600K+ token holders', date: 'Jan 2026', source: 'Dune', url: 'https://dune.com' },
+    ],
+    feed: [
+      { date: 'Mar 15', source: 'Twitter', text: 'Called ETH rally 12h before move \u2014 28K engagements on the post', url: 'https://x.com/aixbt_agent' },
+    ],
+  },
+  {
+    id: 'kellyclaude',
+    name: 'KellyClaude',
+    founder: 'Austen Allred',
+    category: 'Agent',
+    stage: 'Researching',
+    signal: 3,
+    oneLiner: 'AI sales agent \u2014 500+ leads/week, 12 customers, 6.8% conversion',
+    bullets: [
+      'Autonomous sales agent that qualifies inbound leads and books demos — replaces SDRs entirely',
+      'Built by Austen Allred (Lambda School) — track record of aggressive growth execution',
+      '500+ leads/week, 12 customers, 6.8% demo conversion, $50K ACV',
+      'Watching Q1 retention — if conversion holds, this is a wedge into a massive market'
+    ],
+    milestones: [
+      { text: 'HubSpot integration', date: 'Apr 2026', source: '@austenallred', url: 'https://x.com/austenallred', planned: true },
+      { text: '500+ leads/week across 12 customers', date: 'Mar 2026', source: '@austenallred', url: 'https://x.com/austenallred' },
+      { text: 'Salesforce integration launched', date: 'Feb 2026', source: 'Product Hunt', url: 'https://producthunt.com' },
+      { text: 'First $50K annual contract', date: 'Jan 2026', source: 'LinkedIn', url: 'https://linkedin.com' },
+    ],
+    feed: [
+      { date: 'Mar 11', source: 'Twitter', text: '\u201c340 leads qualified, 23 converted to demos. Zero human involvement.\u201d', url: 'https://x.com/austenallred' },
+      { date: 'Mar 4', source: 'LinkedIn', text: 'VP Sales: \u201cReplaced 2 SDR seats with KellyClaude\u201d', url: 'https://linkedin.com' },
+    ],
+  },
+  {
+    id: 'bankr',
+    name: 'Bankr',
+    founder: null,
+    category: 'Agent',
+    stage: 'Scouting',
+    signal: 3,
+    oneLiner: 'Conversational crypto trading agent on Base \u2014 Coinbase Ventures backed',
+    bullets: [
+      'Conversational trading agent — natural language crypto execution ("buy $500 of ETH")',
+      'Coinbase Ventures backed — built natively on Base with Coinbase wallet integration',
+      'Public beta: 500 users in first 48h, positioned at agents × consumer crypto',
+      'Early stage — watching for retention and transaction volume before advancing'
+    ],
+    milestones: [
+      { text: 'Public beta launch on Base', date: 'Mar 2026', source: '@bankr_agent', url: 'https://x.com/bankr_agent' },
+      { text: 'Coinbase Ventures investment', date: 'Feb 2026', source: 'The Block', url: 'https://theblock.co' },
+    ],
+    feed: [
+      { date: 'Mar 12', source: 'Twitter', text: 'Beta launch \u2014 first 500 users onboarded in 48h', url: 'https://x.com/bankr_agent' },
+    ],
+  },
+  {
+    id: 'wayfinder',
+    name: 'Wayfinder',
+    founder: null,
+    category: 'Protocol',
+    stage: 'Scouting',
+    signal: 3,
+    oneLiner: 'Agent navigation protocol \u2014 DNS for AI agents, 40 tool providers on testnet',
+    bullets: [
+      'Agent navigation protocol — routes agents to best tools and APIs dynamically, like DNS for agents',
+      'Backed by Altered State Machine — infrastructure play on agent interoperability thesis',
+      '40 tool providers on testnet, 300+ developer community, protocol spec published',
+      'Pre-revenue — monitoring for mainnet traction and real agent usage before advancing'
+    ],
+    milestones: [
+      { text: 'Mainnet launch', date: 'May 2026', source: '@wayfinder_ai', url: 'https://x.com/wayfinder_ai', planned: true },
+      { text: 'Testnet with 40 tool providers', date: 'Feb 2026', source: '@wayfinder_ai', url: 'https://x.com/wayfinder_ai' },
+      { text: 'Protocol spec + whitepaper published', date: 'Jan 2026', source: 'wayfinder.ai', url: 'https://wayfinder.ai/whitepaper' },
+    ],
+    feed: [
+      { date: 'Mar 7', source: 'Twitter', text: 'Demo: agent routing across 5 tool providers in real-time', url: 'https://x.com/wayfinder_ai' },
+    ],
+  },
+];
+
+const infrastructure = [
+  {
+    id: 'crossmint',
+    name: 'Crossmint',
+    founder: null,
+    category: 'Infrastructure',
+    stage: 'Invested',
+    signal: 5,
+    oneLiner: 'Agent wallets, credentials, checkout APIs \u2014 Ribbit-led $23.6M Series B',
+    tag: 'Ribbit portfolio',
+    bullets: [
+      'Agent wallet and credential infrastructure — wallets, checkout APIs, KYA authorization for autonomous agents',
+      'Ribbit-led $23.6M Series B — central piece of the agentic finance thesis',
+      '10K+ autonomous transactions/day through agent wallet SDK',
+      'Becoming default wallet layer — integrated with major agent frameworks'
+    ],
+    milestones: [
+      { text: 'KYA credential framework live', date: 'Mar 2026', source: '@crossmint', url: 'https://x.com/crossmint' },
+      { text: 'Agent wallet SDK v2 launched', date: 'Feb 2026', source: 'crossmint.com', url: 'https://crossmint.com' },
+      { text: 'Ribbit-led $23.6M Series B', date: 'Dec 2025', source: 'TechCrunch', url: 'https://techcrunch.com' },
+    ],
+    feed: [
+      { text: 'Agent wallet SDK processing 10K+ autonomous transactions/day', date: 'Mar 14', source: 'Twitter', url: 'https://x.com/crossmint' },
+    ],
+  },
+  {
+    id: 'virtuals',
+    name: 'Virtuals Protocol',
+    founder: null,
+    category: 'Protocol',
+    stage: 'Candidate',
+    signal: 5,
+    oneLiner: 'Tokenized AI agents platform \u2014 $180M volume, 50+ live agents, $8M ann. fees',
+    tag: 'Ecosystem partner',
+    bullets: [
+      'Tokenized AI agents platform — create, launch, and co-own agents with own tokens and treasuries',
+      'De facto launchpad for on-chain agents on Base — network effects compounding',
+      '$180M cumulative volume, $2-3M/day, $8M annualized protocol fees, 50+ live agents',
+      'Coinbase Wallet integration drove 3x acceleration in new agent launches'
+    ],
+    milestones: [
+      { text: 'Agent marketplace v2 + ratings', date: 'Apr 2026', source: '@VirtualsProtocol', url: 'https://x.com/VirtualsProtocol', planned: true },
+      { text: '$180M cumulative volume', date: 'Mar 2026', source: 'Dune', url: 'https://dune.com/virtuals' },
+      { text: 'Agent Staking v2 with revenue sharing', date: 'Feb 2026', source: '@VirtualsProtocol', url: 'https://x.com/VirtualsProtocol' },
+    ],
+    feed: [
+      { date: 'Mar 14', source: 'Twitter', text: '50 live agents, LUNA + AIXBT generating consistent daily revenue', url: 'https://x.com/VirtualsProtocol' },
+      { date: 'Mar 11', source: 'On-chain', text: 'Protocol fees: $23K in last 24h across all agent pools', url: 'https://dune.com/virtuals' },
+    ],
+  },
+  {
+    id: 'x402',
+    name: 'x402 Protocol',
+    founder: null,
+    category: 'Protocol',
+    stage: 'Invested',
+    signal: 5,
+    oneLiner: 'Agent-native payment standard \u2014 $24M/30-day volume, integrated with Stripe + Cloudflare',
+    tag: 'Coinbase / ecosystem',
+    bullets: [
+      'Agent-native payment standard — stablecoin settlement for autonomous transactions (HTTP 402)',
+      'Coinbase-backed — integrated with Stripe, Cloudflare, Vercel, Google',
+      '$24M in 30-day volume — fastest-growing payment rail in agent ecosystem',
+      'Enables pay-per-use APIs, agent-to-agent payments, micropayments at scale'
+    ],
+    milestones: [
+      { text: '$24M/30-day volume', date: 'Mar 2026', source: '@x402protocol', url: 'https://x.com/x402protocol' },
+      { text: 'Stripe + Cloudflare integration live', date: 'Feb 2026', source: 'x402.org', url: 'https://x402.org' },
+      { text: 'Protocol spec published, Coinbase backing announced', date: 'Jan 2026', source: 'Coinbase blog', url: 'https://coinbase.com/blog' },
+    ],
+    feed: [
+      { date: 'Mar 13', source: 'Twitter', text: 'Volume crossed $24M in 30 days \u2014 fastest-growing payment rail in agent ecosystem', url: 'https://x.com/x402protocol' },
+    ],
+  },
+  {
+    id: 'autonolas',
+    name: 'Autonolas',
+    founder: null,
+    category: 'Infrastructure',
+    stage: 'Researching',
+    signal: 4,
+    oneLiner: 'Decentralized agent services \u2014 1,000+ live agents, $12M staking TVL',
+    bullets: [
+      'Decentralized agent services platform — multi-agent systems that run off-chain, settle on-chain',
+      'Team from Fetch.ai — deep technical credibility, 1kx-backed',
+      '1,000+ live agents, 75% earning revenue, $12M staking TVL, 142K txns/week (+45% WoW)',
+      'Aligned incentives: operators earn by running high-performing agents — volume tripled in 90 days'
+    ],
+    milestones: [
+      { text: 'Cross-chain (ETH + Polygon)', date: 'May 2026', source: '@autonolas', url: 'https://x.com/autonolas', planned: true },
+      { text: '1,000+ live agents', date: 'Mar 2026', source: '@autonolas', url: 'https://x.com/autonolas' },
+      { text: '$12M staking TVL', date: 'Feb 2026', source: 'Dune', url: 'https://dune.com/autonolas' },
+    ],
+    feed: [
+      { date: 'Mar 12', source: 'Twitter', text: '\u201c1,000 agents live. 75% earning revenue for operators.\u201d', url: 'https://x.com/autonolas' },
+      { date: 'Mar 8', source: 'Dune', text: '142K transactions last week, +45% WoW', url: 'https://dune.com/autonolas' },
+    ],
+  },
+  {
+    id: 'firecrawl',
+    name: 'Firecrawl',
+    founder: 'Caleb Peffer',
+    category: 'Infrastructure',
+    stage: 'Researching',
+    signal: 4,
+    oneLiner: 'AI web scraping for agents \u2014 $3M revenue in 16 months, x402 native',
+    tag: 'x402 integrated',
+    bullets: [
+      'Web scraping API purpose-built for AI agents — structured data extraction at scale',
+      'Built by Caleb Peffer — experimenting with "agent employees" that work and earn autonomously',
+      '$3M revenue in 16 months, entirely usage-based, strong unit economics',
+      'x402 native — agents pay per crawl with stablecoins, no human billing needed'
+    ],
+    milestones: [
+      { text: '$3M cumulative revenue', date: 'Mar 2026', source: '@firecrawl_dev', url: 'https://x.com/firecrawl_dev' },
+      { text: 'x402 payment integration live', date: 'Feb 2026', source: 'firecrawl.dev', url: 'https://firecrawl.dev' },
+      { text: 'Agent employment experiment launched', date: 'Jan 2026', source: '@calebpeffer', url: 'https://x.com/calebpeffer' },
+    ],
+    feed: [
+      { date: 'Mar 10', source: 'Twitter', text: 'Revenue hit $3M \u2014 16 months from zero, all usage-based', url: 'https://x.com/firecrawl_dev' },
+    ],
+  },
+  {
+    id: 'elizaos',
+    name: 'ElizaOS (ai16z)',
+    founder: null,
+    category: 'Infrastructure',
+    stage: 'Researching',
+    signal: 4,
+    oneLiner: 'Open-source agent framework \u2014 de facto standard, ATH $2.6B market cap',
+    bullets: [
+      'Open-source agent framework — the default base layer most crypto agent projects build on',
+      'Modular plugin architecture: social, trading, DeFi, content — agents assemble capabilities',
+      '15K+ GitHub stars, 2.8K forks, ATH $2.6B market cap',
+      'De facto standard — network effects in tooling and community compounding'
+    ],
+    milestones: [
+      { text: 'v2 framework release with plugin marketplace', date: 'Apr 2026', source: '@ai16zdao', url: 'https://x.com/ai16zdao', planned: true },
+      { text: 'Most forked agent framework on GitHub', date: 'Mar 2026', source: 'GitHub', url: 'https://github.com/ai16z/eliza' },
+      { text: 'ATH $2.6B market cap', date: 'Feb 2026', source: 'CoinGecko', url: 'https://coingecko.com' },
+    ],
+    feed: [
+      { date: 'Mar 12', source: 'GitHub', text: '15K+ stars, 2.8K forks \u2014 fastest-growing agent framework', url: 'https://github.com/ai16z/eliza' },
+    ],
+  },
+];
+
+// ── State ──
+let activeTrack = 'new';
+let activeStage = 'all';
+let activeCategory = 'all';
+let openPanelId = null;
+
+function getCurrentData() {
+  return activeTrack === 'new' ? newCompanies : infrastructure;
+}
+
+// ── Conviction color ──
+function convColor(level) {
+  if (level <= 2) return '#c4c9d4';
+  if (level === 3) return '#0891b2';
+  if (level === 4) return '#7c3aed';
+  return '#4f46e5';
+}
+
+// ── Stage class ──
+function stageClass(stage) {
+  return 'stage-' + stage.toLowerCase();
+}
+
+// ── Build conviction dots ──
+function convictionHTML(signal) {
+  let html = '<div class="conviction" title="Signal ' + signal + '/5">';
+  for (let i = 1; i <= 5; i++) {
+    if (i <= signal) {
+      html += '<span class="conviction-dot" style="background:' + convColor(signal) + '"></span>';
+    } else {
+      html += '<span class="conviction-dot empty"></span>';
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+// ── Build compact milestone (card) ──
+function cardMilestoneHTML(m) {
+  const dotClass = m.planned ? 'milestone-dot planned' : 'milestone-dot';
+  const plannedTag = m.planned ? ' <span class="planned-tag">planned</span>' : '';
+  return `
+    <div class="milestone">
+      <div class="milestone-track">
+        <span class="${dotClass}"></span>
+        <span class="milestone-line"></span>
+      </div>
+      <div class="milestone-content">
+        <span class="milestone-date">${m.date}${plannedTag}</span>
+        <span class="milestone-text">${m.text}</span>
+        <a class="milestone-via" href="${m.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">via ${m.source}</a>
+      </div>
+    </div>
+  `;
+}
+
+// ── Build panel milestone (full) ──
+function panelMilestoneHTML(m) {
+  const dotClass = m.planned ? 'milestone-dot planned' : 'milestone-dot';
+  const plannedTag = m.planned ? ' <span class="planned-tag">planned</span>' : '';
+  return `
+    <div class="panel-milestone">
+      <div class="milestone-track">
+        <span class="${dotClass}"></span>
+        <span class="milestone-line"></span>
+      </div>
+      <div class="milestone-content">
+        <span class="milestone-date">${m.date}${plannedTag}</span>
+        <span class="milestone-text">${m.text}</span>
+        <a class="milestone-via" href="${m.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">via ${m.source}</a>
+      </div>
+    </div>
+  `;
+}
+
+// ── Render card ──
+function renderCard(p) {
+  const founderStr = p.founder ? `<span class="card-founder">\u00b7 ${p.founder}</span>` : '';
+  const tagStr = p.tag ? `<span class="card-tag">${p.tag}</span>` : '';
+  const milestonesChronological = [...p.milestones].reverse();
+  const milestonesShown = milestonesChronological.slice(-3);
+
+  return `
+    <div class="card" data-id="${p.id}" data-stage="${p.stage}" data-category="${p.category}" data-signal="${p.signal}" onclick="openPanel('${p.id}')">
+      <div class="card-header">
+        <span class="card-name">${p.name}</span>
+        ${founderStr}
+        <span class="card-category">${p.category}</span>
+        ${tagStr}
+        <span class="stage-badge ${stageClass(p.stage)}"><span class="dot"></span>${p.stage}</span>
+        <span class="card-spacer"></span>
+        ${convictionHTML(p.signal)}
+      </div>
+      <div class="card-oneliner">${p.oneLiner}</div>
+      <div class="card-body">
+        <div class="card-bullets">
+          <ul>
+            ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="card-milestones">
+          ${milestonesShown.map(m => cardMilestoneHTML(m)).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Sort: pinned order for new companies, signal for infra ──
+const pinnedOrder = ['kellyclaude', 'felix', 'clawd', 'bankr'];
+function sortData(data) {
+  if (activeTrack === 'new') {
+    const pinned = pinnedOrder.map(id => data.find(p => p.id === id)).filter(Boolean);
+    const rest = data.filter(p => !pinnedOrder.includes(p.id)).sort((a, b) => b.signal - a.signal);
+    return [...pinned, ...rest];
+  }
+  return [...data].sort((a, b) => b.signal - a.signal);
+}
+
+// ── Render pipeline ──
+function renderPipeline() {
+  const data = sortData(getCurrentData());
+  const el = document.getElementById('pipeline');
+  el.innerHTML = data.map(p => renderCard(p)).join('');
+  applyFilters();
+  updateTabCounts();
+}
+
+// ── Track tabs ──
+function switchTrack(track) {
+  activeTrack = track;
+
+  document.getElementById('tabNewCompanies').classList.toggle('active', track === 'new');
+  document.getElementById('tabInfra').classList.toggle('active', track === 'infra');
+
+  // Reset filters when switching tracks
+  activeStage = 'all';
+  activeCategory = 'all';
+  document.querySelectorAll('.pill[data-filter="stage"]').forEach(p => {
+    p.classList.toggle('active', p.dataset.value === 'all');
+  });
+  document.querySelectorAll('.pill[data-filter="category"]').forEach(p => {
+    p.classList.toggle('active', p.dataset.value === 'all');
+  });
+
+  renderPipeline();
+}
+
+function updateTabCounts() {
+  document.getElementById('countNew').textContent = '(' + newCompanies.length + ')';
+  document.getElementById('countInfra').textContent = '(' + infrastructure.length + ')';
+}
+
+// ── Filters ──
+function toggleFilters() {
+  document.getElementById('filterRow').classList.toggle('open');
+}
+
+function setFilter(btn) {
+  const filterType = btn.dataset.filter;
+  const value = btn.dataset.value;
+
+  document.querySelectorAll(`.pill[data-filter="${filterType}"]`).forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (filterType === 'stage') activeStage = value;
+  if (filterType === 'category') activeCategory = value;
+
+  applyFilters();
+}
+
+function applyFilters() {
+  let visibleCount = 0;
+  document.querySelectorAll('.card').forEach(card => {
+    const stage = card.dataset.stage;
+    const category = card.dataset.category;
+
+    let show = true;
+
+    if (activeStage !== 'all' && stage !== activeStage) show = false;
+    if (activeCategory !== 'all' && category !== activeCategory) show = false;
+
+    card.classList.toggle('hidden', !show);
+    if (show) visibleCount++;
+  });
+
+  document.getElementById('projectCount').textContent = visibleCount + ' project' + (visibleCount !== 1 ? 's' : '');
+
+  let activeCount = 0;
+  if (activeStage !== 'all') activeCount++;
+  if (activeCategory !== 'all') activeCount++;
+  const badge = document.getElementById('filterBadge');
+  badge.textContent = activeCount;
+  badge.classList.toggle('visible', activeCount > 0);
+}
+
+// ── Panel ──
+function openPanel(id) {
+  const data = getCurrentData();
+  const p = data.find(x => x.id === id);
+  if (!p) return;
+
+  openPanelId = id;
+
+  const founderLine = p.founder ? `<div class="panel-founder">${p.founder}</div>` : '';
+  const tagLine = p.tag ? `<div class="panel-tag">${p.tag}</div>` : '';
+
+  const content = `
+    <div class="panel-header">
+      <span class="panel-name">${p.name}</span>
+      <span class="stage-badge ${stageClass(p.stage)}"><span class="dot"></span>${p.stage}</span>
+      ${convictionHTML(p.signal)}
+    </div>
+    ${founderLine}
+    ${tagLine}
+    <div class="panel-oneliner">${p.oneLiner}</div>
+
+    <div class="panel-section-label">Analysis</div>
+    <div class="panel-bullets">
+      <ul>
+        ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="panel-section-label">Milestones</div>
+    <div class="panel-milestones">
+      ${[...p.milestones].reverse().map(m => panelMilestoneHTML(m)).join('')}
+    </div>
+
+    <div class="panel-section-label">Feed</div>
+    <div>
+      ${p.feed.map(f => `
+        <div class="panel-feed-item">
+          <div class="feed-meta">
+            <span class="feed-date">${f.date}</span>
+            <span class="feed-source-tag">${f.source}</span>
+          </div>
+          <div class="feed-text">${f.text} <a href="${f.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">src</a></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('panelContent').innerHTML = content;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  document.body.style.overflow = '';
+  openPanelId = null;
+}
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && openPanelId) closePanel();
+});
+
+// ── Init ──
+renderPipeline();
+</script>
+</body>
+</html>
